@@ -1,0 +1,8 @@
+{
+  "name": "P2P_Real-Time_Colaboration_Prototype_Server",
+  "version": "1.0.0",
+  "dependencies": {
+    "express": "^4.14.1",
+    "peer": "^0.2.8"
+  }
+}

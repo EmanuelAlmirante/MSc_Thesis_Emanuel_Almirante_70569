@@ -7,8 +7,10 @@ Right now, the client connects to the server and the server gives him a random I
 
 Next tasks to be done:
 
-* Make the client's IP appear to the client.
+*Make the client's IP appear to the client (not very important).
 
-2 - program the Peer Coordinator.
+*Program the Peer Coordinator, so that the P2P part can be done.
 
-3 - do the P2P part, 
+*Do the P2P part, so that the video is download from the server only by one clien and the other clients download it through P2P.
+
+*Make the peers able to colaborate with content and that content is shown to the other peers.

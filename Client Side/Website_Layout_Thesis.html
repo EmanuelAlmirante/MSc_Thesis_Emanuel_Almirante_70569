@@ -14,11 +14,11 @@
         var peer = new Peer({
             host: 'localhost',
             port: 9000,
-            path: '/peerjs',
+            path: '/',
             debug: 3,
             config: {
                 'iceServers': [{
-                    urls: 'stun:stun1.l.google.com:19302'
+                    url: 'stun:stun1.l.google.com:19302'
                 }, ]
             }
         });
@@ -36,7 +36,7 @@
         })
 
         //Awaits for the connection
-        //peer.on('connection', connect);
+        peer.on('connection', connect);
     </script>
 </head>
 
@@ -53,8 +53,7 @@
     </div>
 
     <video id="mainStream" width="1000" height="500" controls>
-        <!--Attention to the video source.-->
-    <source src="file:///C:\Users\Emanuel\Desktop\Prototype Master Thesis\MSc_Thesis_Emanuel_Almirante_70569\Server Side\Donald Trump Calls Conan.mp4" frameborder="0" allowfullscreen type="video/mp4">
+    <source src="file:///C:\Users\Emanuel\Desktop\Prototype Master Thesis\Server Side\Donald Trump Calls Conan.mp4" frameborder="0" allowfullscreen type="video/mp4">
     </video>
 
     <form class="box" method="post" action="" enctype="multipart/form-data">

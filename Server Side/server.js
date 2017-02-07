@@ -1,15 +1,16 @@
 var express = require('express');
 var app = express();
 var ExpressPeerServer = require('peer').ExpressPeerServer;
-var server = app.listen(9000);
+var server = app.listen(9000, '127.0.0.1');
 var options = { allow_discovery: true }
 var PeerServer = ExpressPeerServer(server, options);
+var ip;
 
-app.set("trust proxy", true);
+app.enable('trust proxy');
 
-app.use('/peerjs', PeerServer);
+app.use('/', PeerServer);
 
-//Not necessary.
+//Não necessário
 PeerServer.on('connection', function(id) {
     console.log(id)
 });

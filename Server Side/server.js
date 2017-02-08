@@ -7,7 +7,7 @@ var PeerServer = ExpressPeerServer(server, options);
 
 app.enable('trust proxy');
 
-app.use('/', PeerServer);
+app.use('/peerjs', PeerServer);
 
 //Não necessário
 PeerServer.on('connection', function(id) {

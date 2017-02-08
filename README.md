@@ -13,6 +13,6 @@ Next tasks to be done:
 
 * Program the Peer Coordinator, so that the P2P part can be done.
 
-* Do the P2P part, so that the video is download from the server only by one clien and the other clients download it through P2P.
+* Do the P2P part, so that the video is download from the server only by one client and the other clients download it through P2P.
 
-* Make the peers able to colaborate with content and that content is shown to the other peers.
+* Make the peers able to colaborate with content (a live stream or a pre-recorded video, but more focused on pre-recorded) and that content is shown to the other peers.

@@ -9,7 +9,7 @@ Right now, the client connects to the server and the server gives him a random I
 
 Next tasks to be done:
 
-* Program the Peer Coordinator, so that the P2P part can be done.
+* Program P2P part so that two users can connect to each other.
 
 * Do the P2P part, so that the video is download from the server only by one client and the other clients download it through P2P.
 

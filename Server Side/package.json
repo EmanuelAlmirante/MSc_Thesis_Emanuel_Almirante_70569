@@ -1,12 +1,17 @@
 {
-  "name": "P2P_Real-Time_Colaboration_Prototype_Server",
-  "version": "1.0.0",
-  "dependencies": {
-    "express": "^4.14.1",
-	"peer-server": "^1.1.2",
-    "peer": "^0.2.8"
-  }
+    "name": "P2P_Real-Time_Colaboration_Prototype_Server",
+    "version": "1.0.0",
+    "description": "",
+    "main": "server.js",
+    "dependencies": {
+        "express": "^4.14.1",
+        "peer": "^0.2.8",
+        "peer-server": "^1.1.2"
+    },
+    "devDependencies": {},
     "scripts": {
-    "start": "node server.js"
-  },
+        "start": "node server.js"
+    },
+    "author": "",
+    "license": "ISC"
 }

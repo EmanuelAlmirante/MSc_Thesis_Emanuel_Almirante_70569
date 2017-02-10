@@ -1,4 +1,6 @@
 $(document).ready(function()  {
+    var connections = {};
+
     //Get the ID from the server
     // PeerJS object
     var peer = new Peer({
@@ -12,9 +14,6 @@ $(document).ready(function()  {
             }, ]
         }
     });
-
-    //var conn;
-    //var connections = [];
 
     peer.on('open', function() {
         $('#id').text(peer.id);

@@ -1,10 +1,10 @@
-$(document).ready(function() {
+$(document).ready(function()  {
     //Get the ID from the server
     // PeerJS object
     var peer = new Peer({
         host: 'localhost',
         port: 9000,
-        path: '/',
+        path: '/peerjs',
         debug: 3,
         config: {
             'iceServers': [{

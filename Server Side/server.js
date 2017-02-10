@@ -1,17 +1,30 @@
 var express = require('express');
 var app = express();
 var ExpressPeerServer = require('peer').ExpressPeerServer;
-var server = app.listen(9000, '127.0.0.1');
-var options = { allow_discovery: true }
+
+//
+
+app.use(express.static(__dirname + '/public', { etag: false, lastModified: false }));
+
+var server = app.listen(9000, function() {
+
+    var host = server.address().address;
+    var port = server.address().port;
+
+    console.log('Listening at http://%s:%s', host, port);
+
+});
+
 var PeerServer = ExpressPeerServer(server, options);
-var ip;
+var options = {
+    debug: true,
+    allowDiscovery: true,
+    allow_discovery: true
+}
 
-app.enable('trust proxy');
+app.use('/peerjs', PeerServer);
 
-app.use('/', PeerServer);
-
+//Not necessary.
 PeerServer.on('connection', function(id) {
     console.log(id)
 });
-
-app.use(express.static(__dirname + '/public'));

@@ -2,7 +2,13 @@ var express = require('express');
 var app = express();
 var ExpressPeerServer = require('peer').ExpressPeerServer;
 
-//
+//Not necessary, only for debugging.
+app.use(function(req, res, next) {
+    if (req.path.indexOf('video') != -1) {
+        console.log('Streaming video: ' + req.path);
+    }
+    next();
+});
 
 app.use(express.static(__dirname + '/public', { etag: false, lastModified: false }));
 
@@ -24,7 +30,7 @@ var options = {
 
 app.use('/peerjs', PeerServer);
 
-//Not necessary.
+//Not necessary, only for debugging.
 PeerServer.on('connection', function(id) {
     console.log(id)
 });

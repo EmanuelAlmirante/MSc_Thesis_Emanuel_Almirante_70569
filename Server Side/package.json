@@ -1,8 +1,12 @@
 {
     "name": "P2P_Real-Time_Colaboration_Prototype_Server",
     "version": "1.0.0",
-    "description": "",
+    "description": "A real-time colaboration service implemented for my thesis.",
     "main": "server.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/EmanuelAlmirante/MSc_Thesis_Emanuel_Almirante_70569.git"
+    },
     "dependencies": {
         "express": "^4.14.1",
         "peer": "^0.2.8",
@@ -10,6 +14,7 @@
     },
     "devDependencies": {},
     "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
         "start": "node server.js"
     },
     "author": "",

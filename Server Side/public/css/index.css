@@ -1,18 +1,7 @@
-.box__input {
-    padding-top: 30px;
-}
-
-.box__dragndrop,
-.box__uploading,
-.box__success,
-.box__error {
-    display: none;
-}
-
-#actions {
+.stats {
     position: absolute;
     float: right;
-    left: 1050px;
+    left: 1000px;
     width: 500px;
     height: 50px
 }

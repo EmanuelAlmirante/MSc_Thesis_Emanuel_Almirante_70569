@@ -12,31 +12,13 @@
 </head>
 
 <body>
-    <div id="top" , style="width:100%">
-        <div style="width:100%">
-            <h1 align="center">P2P Real-Time Colaboration Prototype</h1>
-        </div>
+    <div class="stats">
+        <p class="id">Your ID is: <span id="id"></span>
+            <br>
+        </p>
     </div>
 
-    <div id="actions">
-        Your ID is <br><span id="id"></span>
-        <br>
-    </div>
-
-    <video id="video source" width="1000" height="500" controls>
-        <source src="video\Donald Trump Calls Conan.mp4" frameborder="0" allowfullscreen type="video/mp4">
-    </video>
-
-    <form class="box" method="post" action="" enctype="multipart/form-data">
-        <div class="box__input">
-            <input class="box__file" type="file" name="files[]" id="file" data-multiple-caption="{count} files selected" multiple />
-            <label for="file"><strong>Choose a file.</label>
-            <button class="box__button" type="submit">Upload</button>
-        </div>
-        <div class="box__uploading">Uploading&hellip;</div>
-        <div class="box__success">Done!</div>
-        <div class="box__error">Error! <span></span>.</div>
-    </form>
+    <video id="video source" src="/video/Donald Trump Calls Conan.mp4" frameborder="0" allowfullscreen type="video/mp4" width="1000" height="500" controls autoplay />
 
 </body>
 

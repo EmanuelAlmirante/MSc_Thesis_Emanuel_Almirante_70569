@@ -14,8 +14,17 @@
 <body>
     <div class="stats">
         <p class="id">Your ID is: <span id="id"></span>
-            <br>
         </p>
+        <p class="server">Server:
+            <span id="server-count">0</span> file(s) /
+            <span id="server-size">0</span> bytes
+        </p>
+        <p class="peer">Peer:
+            <span id="peer-count">0</span> file(s) /
+            <span id="peer-size">0</span> bytes
+        </p>
+        <ul id="peerlist">
+        </ul>
     </div>
 
     <video id="video source" src="/video/Donald Trump Calls Conan.mp4" frameborder="0" allowfullscreen type="video/mp4" width="1000" height="500" controls autoplay />

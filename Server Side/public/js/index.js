@@ -10,6 +10,7 @@ $(document).ready(function()  {
         port: 9000,
         path: '/peerjs',
         debug: 3,
+        //Maybe not necessary.
         config: {
             'iceServers': [{
                 url: 'stun:stun1.l.google.com:19302'
@@ -17,7 +18,7 @@ $(document).ready(function()  {
         }
     });
 
-    //Mudar esta coisa.
+    //Mudar esta coisa??
     // To show the ID of the peer.
     peer.on('open', function() {
         $('#id').text(peer.id);
@@ -136,6 +137,46 @@ $(document).ready(function()  {
         }
     }
 
+    //Configure connection between peers and server and peers and peers.
+    function configureConnection(conn, done) {
+        conn.on('data', function(data) {
+            if (data && !data.request && data.hash && window.localStorage) {
+                //Debug, apagar depois.
+                console.log('got data');
+                console.log(data);
+                console.log('************************');
+                document.querySelector('data-id="' + data.id + '"]')
+                loggerz('peer', data.content, conn.peer);
+                storeContent(data, true);
+            } else if (data && data.request && data.hash && window.localStorage) {
+                if (window.localStorage[data.hash] != undefined) {
+                    //Debug, apagar depois.
+                    console.log('got request data');
+                    console.log(window.localStorage[data.hash]);
+                    var toSend = JSON.parse(window.localStorage[data.hash]);
+                    //Debug, apagar depois.
+                    console.log(toSend);
+                    conn.send(toSend);
+                }
+            } else {
+                //Debug, apagar depois.
+                console.log('alternative');
+                console.log(data);
+            }
+        });
 
+        if (done !== undefined) {
+            done();
+        } else {
+            //Debug, apagar depois.
+            console.log('no done : ' + conn);
+        }
+    }
+
+    //Store the hash of the content and announce it.
+    function storeContent(opts, announce) {
+        window.localStorage[opts.hash] = JSON.stringify(opts);
+        if (announce) peer.announceContent(opts.hash);
+    }
 
 });

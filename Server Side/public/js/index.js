@@ -1,8 +1,7 @@
 $(document).ready(function()  {
     var connections = {};
 
-    //Get the ID from the server
-    // PeerJS object
+    //Gets the ID from the server and creates a PeerJS object.
     var peer = new Peer({
         // host: '52.18.51.141', servidor online
         // port: 80, servidor online
@@ -18,22 +17,9 @@ $(document).ready(function()  {
         }
     });
 
-    //Mudar esta coisa??
     // To show the ID of the peer.
     peer.on('open', function() {
         $('#id').text(peer.id);
-    });
-
-    //Mudar esta coisa.
-    //In case of error.
-    peer.on('error', function(e) {
-        alert(e.message);
-    })
-
-    //Mudar esta coisa.
-    //Awaits for the connection. Maybe not necessary.
-    peer.on('connection', function(friend) {
-        console.log('Connected to ' + friend);
     });
 
     //To play the video.
@@ -178,5 +164,95 @@ $(document).ready(function()  {
         window.localStorage[opts.hash] = JSON.stringify(opts);
         if (announce) peer.announceContent(opts.hash);
     }
+
+    //Connect to a peer and request the content.
+    function connectAndRequest(opts, list) {
+        var chosenOne = list[Math.floor(Math.random() * list.length)];
+        var conn = connections[chosenOne];
+
+        if (conn == undefined) {
+            conn = peer.connect(chosenOne);
+            connections[chosenOne] = conn;
+            conn.on('open', function() {
+                configureConnection(conn, function() {
+                    console.log('REQ _ ' + opts.fullurl);
+                    conn.send({ request: true, hash: opts.hash });
+                })
+            });
+            conn.on('error', function(err) { alert(err); });
+        } else {
+            var timesTried = 0;
+            var random = Math.random();
+            var intv = setInterval(function() {
+                if (conn.open) {
+                    clearTimeout(intv);
+                    console.log('REQ _ ' + opts.fullurl);
+                    conn.send({ request: true, hash: opts.hash });
+                } else {
+                    timesTried++;
+                    console.log('closed');
+                    if (timesTried == 5) {
+                        clearTimeout(intv);
+                        console.log('REQ _ ' + opts.fullurl);
+                        getVideoFromServer(opts);
+                    }
+                }
+            }, 3000);
+        }
+    }
+
+    peer.on('connection', configureConnection);
+
+    window.onload = function() {
+        interval = setInterval(function() {
+            if (peer.open && !runned) {
+                //Debug, apagar depois.
+                console.log('runnerz');
+                runned = true;
+                window.clearTimeout(interval);
+                var video = document.querySelectorAll("video");
+                var index;
+                //Debug, apagar depois.
+                console.log("video" + video.length);
+                for (index = 0; index < video.length; index++) {
+                    (function(idx) {
+                        var currentVideo = video[idx];
+                        var videoOptions = {};
+
+                        //Debug, apagar depois.
+                        console.log(currentVideo.getAttribute('src'));
+                        var datasrc = currentVideo.getAttribute('src');
+                        var hashens = datasrc.hashCode();
+                        var fullurl = datasrc;
+
+                        currentVideo.setAttribute('data-id', hashens);
+
+                        videoOptions.id = currentVideo.getAttribute('data-id');
+                        videoOptions.datasrc = datasrc;
+                        videoOptions.hash = hashens;
+                        videoOptions.fullurl = fullurl;
+
+                        if (false) {
+                            //Debug, apagar depois.
+                            console.log('truedom');
+                            video[index].setAttribute('src', videoOptions.datasrc);
+                        } else {
+                            peer.listAllPeersWithContent(videoOptions.hash, function(list) {
+                                if (list && list.length == 0) {
+                                    //Debug, apagar depois.
+                                    console.log('servs');
+                                    getVideoFromServer(videoOptions);
+                                } else {
+                                    //Debug, apagar depois.
+                                    console.log('peerz');
+                                    connectAndRequest(videoOptions, list);
+                                }
+                            });
+                        }
+                    })(index);
+                }
+            }
+        }, 3000);
+    };
 
 });

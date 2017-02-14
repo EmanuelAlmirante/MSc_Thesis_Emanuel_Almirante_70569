@@ -9,10 +9,9 @@ $(document).ready(function()  {
         port: 9000,
         path: '/peerjs',
         debug: 3,
-        //Maybe not necessary.
         config: {
             'iceServers': [{
-                url: 'stun:stun1.l.google.com:19302'
+                urls: 'stun:stun1.l.google.com:19302'
             }, ]
         }
     });
@@ -22,6 +21,7 @@ $(document).ready(function()  {
         $('#id').text(peer.id);
     });
 
+    //Mudar/apagar.
     //To play the video.
     /*$('video source').each(function(i, video) {
         var videoData = $(video).attr('data-src');
@@ -80,9 +80,17 @@ $(document).ready(function()  {
     //To show the stats in 'Server:' and 'Peer:'.
     function loggerz(type, content, peer) {
         var currentcount = document.getElementById(type + '-count').textContent;
+        //Debug, apagar depois.
+        console.log(currentcount);
         if (currentcount.length > 0) currentcount = parseInt(currentcount);
+        //Debug, apagar depois.
+        console.log(currentcount);
         currentcount++;
+        //Debug, apagar depois.
+        console.log(currentcount);
         document.getElementById(type + '-count').textContent = currentcount.toString();
+        //Debug, apagar depois.
+        console.log(document.getElementById(type + '-count').textContent);
 
         var currentsize = document.getElementById(type + 'size').textContent;
         if (currentsize.length > 0) currentsize = parseInt(currentsize);
@@ -197,7 +205,7 @@ $(document).ready(function()  {
                         getVideoFromServer(opts);
                     }
                 }
-            }, 3000);
+            }, 500);
         }
     }
 
@@ -252,7 +260,7 @@ $(document).ready(function()  {
                     })(index);
                 }
             }
-        }, 3000);
+        }, 500);
     };
 
 });

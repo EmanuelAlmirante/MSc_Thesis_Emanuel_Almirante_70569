@@ -62,7 +62,7 @@ $(document).ready(function()  {
 
     //Get the video from the server. 
     function getVideoFromServer(opts) {
-        var video = document.querySelector('[data-id= "' + opts.id + '"]')
+        var video = document.querySelector('[data-id= "' + opts.id + '"]');
         console.log(video);
 
         //Debug, delete.

@@ -9,8 +9,8 @@ Right now, the client connects to the server and the server gives him a random I
 
 Next tasks to be done:
 
-* Program P2P part so that two users can connect to each other.
-
 * Do the P2P part, so that the video is download from the server only by one client and the other clients download it through P2P.
+
+* Program P2P part so that two users can connect to each other.
 
 * Make the peers able to colaborate with content (a live stream or a pre-recorded video, but more focused on pre-recorded) and that content is shown to the other peers.

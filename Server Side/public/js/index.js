@@ -28,8 +28,12 @@ $(document).ready(function()  {
 
     //Transform the name of the video in base 64, to improve delivery of files. getBase64FromVideoURL
     function getBase64FromVideoURL(url, done) {
-        var video = document.getElementById("video");
+        //var video = document.getElementById("video");
+        var video = document.createElement("video");
+        //video.setAttribute("src", url);
         console.log(video);
+        //var video = document.createElement("video");
+        //video.setAttribute("src", "nameOfFile.ogg");
 
         video.onload = function() {
             console.log('1');
@@ -43,6 +47,7 @@ $(document).ready(function()  {
         }
 
         video.src = url;
+        console.log(video);
         console.log(url);
     };
 

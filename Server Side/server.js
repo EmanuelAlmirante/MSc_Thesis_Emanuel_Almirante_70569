@@ -21,16 +21,10 @@ var server = app.listen(8000, function() {
 
 });
 
-var PeerServer = ExpressPeerServer(server, options);
 var options = {
     debug: true,
     allowDiscovery: true,
     allow_discovery: true
 }
 
-app.use('/peerjs', PeerServer);
-
-//Not necessary, only for debugging.
-PeerServer.on('connection', function(id) {
-    console.log(id)
-});
+app.use('/peerjs', ExpressPeerServer(server, options));

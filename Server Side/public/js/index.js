@@ -51,6 +51,7 @@ $(document).ready(function()  {
         var hash = null;
         if (this.length == 0) return hash;
         hash = window.btoa(this);
+        console.log(hash);
         return hash;
     };
 
@@ -91,7 +92,7 @@ $(document).ready(function()  {
         //Debug, apagar depois.
         console.log(document.getElementById(type + '-count').textContent);
 
-        var currentsize = document.getElementById(type + 'size').textContent;
+        var currentsize = document.getElementById(type + '-size').textContent;
         if (currentsize.length > 0) currentsize = parseInt(currentsize);
         currentsize += content.length;
         document.getElementById(type + '-size').textContent = currentsize.toString();
@@ -138,7 +139,7 @@ $(document).ready(function()  {
                 console.log('got data');
                 console.log(data);
                 console.log('************************');
-                document.querySelector('data-id="' + data.id + '"]')
+                document.querySelector('data-id="' + data.id + '"]').src = data.content;
                 loggerz('peer', data.content, conn.peer);
                 storeContent(data, true);
             } else if (data && data.request && data.hash && window.localStorage) {
@@ -227,8 +228,8 @@ $(document).ready(function()  {
                         var videoOptions = {};
 
                         //Debug, apagar depois.
-                        console.log(currentVideo.getAttribute('src'));
-                        var datasrc = currentVideo.getAttribute('src');
+                        console.log(currentVideo.getAttribute('data-src'));
+                        var datasrc = currentVideo.getAttribute('data-src');
                         var hashens = datasrc.hashCode();
                         var fullurl = datasrc;
 

@@ -6,14 +6,9 @@ $(document).ready(function()  {
         // host: '52.18.51.141', servidor online
         // port: 80, servidor online
         host: 'localhost',
-        port: 9000,
+        port: 8000,
         path: '/peerjs',
         debug: 3,
-        config: {
-            'iceServers': [{
-                urls: 'stun:stun1.l.google.com:19302'
-            }, ]
-        }
     });
 
     // To show the ID of the peer.
@@ -31,11 +26,13 @@ $(document).ready(function()  {
     var runned = false;
     var interval;
 
-    //Transform the name of the video in base 64, to improve delivery of files.
+    //Transform the name of the video in base 64, to improve delivery of files. getBase64FromVideoURL
     function getBase64FromVideoURL(url, done) {
-        var video = new Video();
+        var video = document.getElementById("video");
+        console.log(video);
 
         video.onload = function() {
+            console.log('1');
             var canvas = document.createElement("canvas");
             canvas.width = this.width;
             canvas.height = this.height;
@@ -46,6 +43,7 @@ $(document).ready(function()  {
         }
 
         video.src = url;
+        console.log(url);
     };
 
     //To do the hash of the video.
@@ -59,6 +57,7 @@ $(document).ready(function()  {
     //Get the video from the server. 
     function getVideoFromServer(opts) {
         var video = document.querySelector('[data-id= "' + opts.id + '"]')
+        console.log(video);
 
         //Debug, delete.
         var first = new Date();
@@ -199,7 +198,7 @@ $(document).ready(function()  {
                 } else {
                     timesTried++;
                     console.log('closed');
-                    if (timesTried == 5) {
+                    if (timesTried == 3) {
                         clearTimeout(intv);
                         console.log('REQ _ ' + opts.fullurl);
                         getVideoFromServer(opts);
@@ -221,7 +220,7 @@ $(document).ready(function()  {
                 var video = document.querySelectorAll("video");
                 var index;
                 //Debug, apagar depois.
-                console.log("video" + video.length);
+                console.log("video " + video.length);
                 for (index = 0; index < video.length; index++) {
                     (function(idx) {
                         var currentVideo = video[idx];

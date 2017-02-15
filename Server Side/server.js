@@ -12,7 +12,7 @@ app.use(function(req, res, next) {
 
 app.use(express.static(__dirname + '/public', { etag: false, lastModified: false }));
 
-var server = app.listen(9000, function() {
+var server = app.listen(8000, function() {
 
     var host = server.address().address;
     var port = server.address().port;

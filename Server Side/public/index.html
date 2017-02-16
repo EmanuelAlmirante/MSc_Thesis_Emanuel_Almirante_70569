@@ -2,52 +2,57 @@
 <html>
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Project for my thesis.">
+    <meta name="keywords" content="P2P, WWW, WebRTC, PPSP, RTC, Real-Time Collaboration">
+    <meta name="author" content="Emanuel Almirante">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="cache-control" content="max-age=0" />
     <meta http-equiv="cache-control" content="no-cache" />
     <meta http-equiv="expires" content="0" />
     <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
     <meta http-equiv="pragma" content="no-cache" />
+
     <title>P2P Real-Time Colaboration Prototype</title>
+
     <link rel="stylesheet" href="css/index.css" type="text/css">
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
-    <script type="text/javascript" src="/js/peer.min.js"></script>
-    <script type="text/javascript" src="/js/index.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js" defer></script>
+    <script type="text/javascript" src="/js/peer.min.js" defer></script>
+    <script type="text/javascript" src="/js/index.js" defer></script>
 
 </head>
 
 <body>
 
+    <canvas id="canvas"></canvas>
+
     <div class="stats">
         <p class="id">Your ID is: <span id="id"></span>
         </p>
         <p class="server">Server:
-            <span id="server-count">0</span> file(s) /
-            <span id="server-size">0</span> bytes
+            <span id="server-count">0</span> file(s) / <span id="server-size">0</span> bytes
         </p>
         <p class="peer">Peer:
-            <span id="peer-count">0</span> file(s) /
-            <span id="peer-size">0</span> bytes
+            <span id="peer-count">0</span> file(s) / <span id="peer-size">0</span> bytes
         </p>
-        <ul id="peerlist">
-        </ul>
+        <ul id="peerlist"></ul>
+        <p class="streams">Streams available:
+            <ul id="streamlist"></ul>
+        </p>
     </div>
 
-    <div class="collaborate-with-stream">
-        <button id="start-stream" onclick="startStream()">Start streaming (click)</button>
-    </div>
+    <video id="video" data-src="/video/DonaldTrumpCallsConan.mp4" frameborder="0" allowfullscreen type="video/mp4" controls></video>
 
-    <div class="stop-with-stream">
-        <button id="stop-stream" onclick="stopStream()">Stop streaming (click)</button>
-    </div>
+    <button id="start-stream" onclick="startStream()">Start your own stream (click)</button>
+    <button id="stop-stream" onclick="stopStream()">Stop your own stream (click)</button>
+    <form>
+        <!-- I have to complete this! EMANUEL. -->
+        <input id="call-to-id" type="text" placeholder="ID of the stream" />
+        <input id="submit-call-to-id" type="submit" value="Connect">
+    </form>
 
-    <div class="connect-to-stream">
-        <input type="text" id="callto-id" placeholder="ID of the stream" width="1" />
-        <button href="#" id="connect-stream" onclick="myFunction()">Connect</buttons>
-    </div>
-
-    <div class="videoCDN">
-        <video id="video " data-src="/video/DonaldTrumpCallsConan.mp4 " frameborder="0" allowfullscreen type="video/mp4 " width="1000 " height="500" controls /> </video>
-        <video id="my-video" width="1000 " height="500" autoplay></video>
+    <div id="myVideoStreamHidden" class="myVideoStream" style="display:none;">
+        <video id="my-video" autoplay></video>
     </div>
 
 </body>

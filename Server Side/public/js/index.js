@@ -29,38 +29,25 @@ $(document).ready(function()  {
         call.answer(window.localStream);
         step3(call);
     });
-    peer.on('error', function(err) {
-        alert(err.message);
-        //Return to step 2 if error occurs.
-        step2();
-    });
-
-    $(function() {
-        //Begins the stream of the user. Basically, gets its video and audio and displays.
-        $('#start-stream').click(function() {
-            //Initiate stream.
-            startStream();
-        });
-
-        $('#stop-stream').click(function() {
-            stopStream();
-        });
-    });
 
     function startStream() {
+        document.getElementById('myVideoStreamHidden').style.display = "block";
         //Get audio/video stream.
         navigator.getUserMedia({ audio: true, video: true }, function(stream) {
             //Set your video displays.
             $('#my-video').prop('src', URL.createObjectURL(stream));
 
             window.localStream = stream;
+
+            console.log(peer.id);
             reset();
         }, function() { $('#startStream-error').show(); });
     }
 
     //Stops the stream.
     function stopStream() {
-        localStream.stop();;
+        document.getElementById('myVideoStreamHidden').style.display = "none";
+        localStream.stop();
     }
 
     function reset() {
@@ -86,6 +73,18 @@ $(document).ready(function()  {
         $('#step1, #step2').hide();
         $('#step3').show();
     }
+
+    $(function() {
+        //Begins the stream of the user. Basically, gets its video and audio and displays.
+        $('#start-stream').click(function() {
+            //Initiate stream.
+            startStream();
+        });
+
+        $('#stop-stream').click(function() {
+            stopStream();
+        });
+    });
 
     /*End of the collaboration part of the project. */
 

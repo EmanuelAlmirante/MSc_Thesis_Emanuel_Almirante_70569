@@ -1,5 +1,7 @@
 $(document).ready(function()  {
     var connections = {};
+    var runned = false;
+    var interval;
 
     //Gets the ID from the server and creates a PeerJS object.
     var peer = new Peer({
@@ -16,6 +18,84 @@ $(document).ready(function()  {
         $('#id').text(peer.id);
     });
 
+    /*Beginning of the collaboration part of the project.*/
+
+    //Compatibility shim.
+    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+
+    //Receiving a call.
+    peer.on('call', function(call) {
+        //Answer the call automatically.
+        call.answer(window.localStream);
+        step3(call);
+    });
+    peer.on('error', function(err) {
+        alert(err.message);
+        //Return to step 2 if error occurs.
+        step2();
+    });
+
+    $(function() {
+        //Begins the stream of the user. Basically, gets its video and audio and displays.
+        $('#start-stream').click(function() {
+            //Initiate stream.
+            startStream();
+        });
+
+        $('#stop-stream').click(function() {
+            stopStream();
+        });
+    });
+
+    function startStream() {
+        //Get audio/video stream.
+        navigator.getUserMedia({ audio: true, video: true }, function(stream) {
+            //Set your video displays.
+            $('#my-video').prop('src', URL.createObjectURL(stream));
+
+            window.localStream = stream;
+            reset();
+        }, function() { $('#startStream-error').show(); });
+    }
+
+    //Stops the stream.
+    function stopStream() {
+        localStream.stop();;
+    }
+
+    function reset() {
+        $('#startStream, #displayStreamOfId').hide();
+        $('#reset').show();
+    }
+
+    function displayStreamOfId(call) {
+        //Hang up on an existing call if present.
+        if (window.existingCall) {
+            window.existingCall.close();
+        }
+
+        //Wait for stream on the call, then set peer video display.
+        call.on('stream', function(stream) {
+            $('#their-video').prop('src', URL.createObjectURL(stream));
+        });
+
+        //UI stuff.
+        window.existingCall = call;
+        $('#their-id').text(call.peer);
+        call.on('close', step2);
+        $('#step1, #step2').hide();
+        $('#step3').show();
+    }
+
+    /*End of the collaboration part of the project. */
+
+
+
+
+
+
+    /*Beginning of the video peerCDN part of the project.*/
+
     //Mudar/apagar.
     //To play the video.
     /*$('video source').each(function(i, video) {
@@ -23,8 +103,6 @@ $(document).ready(function()  {
         $(video).attr('src', videoData);
     });*/
 
-    var runned = false;
-    var interval;
 
     //Transform the name of the video in base 64, to improve delivery of files. getBase64FromVideoURL
     function getBase64FromVideoURL(url, done) {
@@ -267,5 +345,6 @@ $(document).ready(function()  {
             }
         }, 500);
     };
+    /*End of the video peerCDN part of the project.*/
 
 });

@@ -16,6 +16,7 @@
 </head>
 
 <body>
+
     <div class="stats">
         <p class="id">Your ID is: <span id="id"></span>
         </p>
@@ -31,7 +32,23 @@
         </ul>
     </div>
 
-    <video id="video" data-src="/video/DonaldTrumpCallsConan.mp4" frameborder="0" allowfullscreen type="video/mp4" width="1000" height="500" controls />
+    <div class="collaborate-with-stream">
+        <button id="start-stream" onclick="startStream()">Start streaming (click)</button>
+    </div>
+
+    <div class="stop-with-stream">
+        <button id="stop-stream" onclick="stopStream()">Stop streaming (click)</button>
+    </div>
+
+    <div class="connect-to-stream">
+        <input type="text" id="callto-id" placeholder="ID of the stream" width="1" />
+        <button href="#" id="connect-stream" onclick="myFunction()">Connect</buttons>
+    </div>
+
+    <div class="videoCDN">
+        <video id="video " data-src="/video/DonaldTrumpCallsConan.mp4 " frameborder="0" allowfullscreen type="video/mp4 " width="1000 " height="500" controls /> </video>
+        <video id="my-video" width="1000 " height="500" autoplay></video>
+    </div>
 
 </body>
 

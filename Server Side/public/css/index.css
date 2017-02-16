@@ -3,5 +3,35 @@
     float: right;
     left: 1010px;
     width: 500px;
+    height: 50px;
+}
+
+.collaborate-with-stream {
+    position: absolute;
+    float: bottom;
+    top: 550px;
+    width: 120px;
     height: 50px
+}
+
+.stop-with-stream {
+    position: absolute;
+    float: bottom;
+    top: 600px;
+    width: 120px;
+    height: 50px
+}
+
+.connect-to-stream {
+    position: absolute;
+    float: bottom;
+    top: 650px;
+    width: 120px;
+    height: 50px;
+}
+
+my-video {
+    position: absolute;
+    float: bottom;
+    top: 650px;
 }

@@ -13,12 +13,12 @@ $(document).ready(function()  {
         debug: 3,
     });
 
+    /*Beginning of the collaboration part of the project.*/
+
     // To show the ID of the peer.
     peer.on('open', function() {
         $('#id').text(peer.id);
     });
-
-    /*Beginning of the collaboration part of the project.*/
 
     //Compatibility shim.
     navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
@@ -27,28 +27,42 @@ $(document).ready(function()  {
     peer.on('call', function(call) {
         //Answer the call automatically.
         call.answer(window.localStream);
-        step3(call);
+        displayStreamOfId(call);
     });
 
     function startStream() {
+        //Show the div where the video is.
         document.getElementById('myVideoStreamHidden').style.display = "block";
         //Get audio/video stream.
         navigator.getUserMedia({ audio: true, video: true }, function(stream) {
             //Set your video displays.
-            $('#my-video').prop('src', URL.createObjectURL(stream));
+            $('#myvideo').prop('src', URL.createObjectURL(stream));
 
             window.localStream = stream;
 
             console.log(peer.id);
             reset();
-        }, function() { $('#startStream-error').show(); });
-    }
+        }, function() { $('#startStreamerror').show(); });
+    };
+
+    //Begins the stream of the user. Basically, gets its video and audio and displays.
+    $('#startstream').click(function() {
+        //Initiate stream.
+        startStream();
+    });
 
     //Stops the stream.
     function stopStream() {
+        //Hide the div where the video is.
         document.getElementById('myVideoStreamHidden').style.display = "none";
-        localStream.stop();
-    }
+        localStream.getVideoTracks()[0].stop();
+        localStream.getAudioTracks()[0].stop();
+    };
+
+    $('#stopstream').click(function() {
+        stopStream();
+    });
+
 
     function reset() {
         $('#startStream, #displayStreamOfId').hide();
@@ -73,18 +87,6 @@ $(document).ready(function()  {
         $('#step1, #step2').hide();
         $('#step3').show();
     }
-
-    $(function() {
-        //Begins the stream of the user. Basically, gets its video and audio and displays.
-        $('#start-stream').click(function() {
-            //Initiate stream.
-            startStream();
-        });
-
-        $('#stop-stream').click(function() {
-            stopStream();
-        });
-    });
 
     /*End of the collaboration part of the project. */
 

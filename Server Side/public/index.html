@@ -43,16 +43,16 @@
 
     <video id="video" data-src="/video/DonaldTrumpCallsConan.mp4" frameborder="0" allowfullscreen type="video/mp4" controls></video>
 
-    <button id="start-stream" onclick="startStream()">Start your own stream (click)</button>
-    <button id="stop-stream" onclick="stopStream()">Stop your own stream (click)</button>
+    <button id="startstream">Start your own stream (click)</button>
+    <button id="stopstream">Stop your own stream (click)</button>
     <form>
         <!-- I have to complete this! EMANUEL. -->
-        <input id="call-to-id" type="text" placeholder="ID of the stream" />
-        <input id="submit-call-to-id" type="submit" value="Connect">
+        <input id="calltoid" type="text" placeholder="ID of the stream" />
+        <input id="submitcalltoid" type="submit" value="Connect">
     </form>
 
     <div id="myVideoStreamHidden" class="myVideoStream" style="display:none;">
-        <video id="my-video" autoplay></video>
+        <video id="myvideo" autoplay></video>
     </div>
 
 </body>

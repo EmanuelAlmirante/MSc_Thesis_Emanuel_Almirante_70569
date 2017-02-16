@@ -21,14 +21,14 @@
     height: 500px;
 }
 
-#start-stream {
+#startstream {
     position: absolute;
     top: 70%;
     width: 120px;
     height: 50px;
 }
 
-#stop-stream {
+#stopstream {
     position: absolute;
     top: 70%;
     left: 9%;
@@ -36,7 +36,7 @@
     height: 50px;
 }
 
-#call-to-id {
+#calltoid {
     position: absolute;
     top: 70%;
     left: 18%;
@@ -44,7 +44,7 @@
     height: 45px;
 }
 
-#submit-call-to-id {
+#submitcalltoid {
     position: absolute;
     top: 70%;
     left: 27%;

@@ -27,9 +27,40 @@ $(document).ready(function()  {
 
     //Begins the stream of the user. Basically, gets its video and audio and displays.
     function startStream() {
+        //Older browsers might not implement mediaDevices at all, so we set an empty object first.
+        if (navigator.mediaDevices === undefined) {
+            navigator.mediaDevices = {};
+        }
+
+        //Some browsers partially implement mediaDevices. We can't just assign an object with getUserMedia as it would overwrite existing properties.
+        //Here, we will just add the getUserMedia property if it's missing.
+        if (navigator.mediaDevices.getUserMedia === undefined) {
+            navigator.mediaDevices.getUserMedia = function(constraints) {
+
+                //First get ahold of the legacy getUserMedia, if present.
+                var getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+
+                //Some browsers just don't implement it - return a rejected promise with an error to keep a consistent interface.
+                if (!getUserMedia) {
+                    return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
+                }
+
+                //Otherwise, wrap the call to the old navigator.getUserMedia with a Promise.
+                return new Promise(function(resolve, reject) {
+                    getUserMedia.call(navigator, constraints, resolve, reject);
+                });
+            }
+        }
+
         navigator.mediaDevices.getUserMedia(constraints1).then(function(mediaStreamOwn) {
             var myvideo = document.querySelector('#myvideo');
-            myvideo.srcObject = mediaStreamOwn;
+            //Older browsers may not have srcObject.
+            if ("srcObject" in video) {
+                myvideo.srcObject = mediaStreamOwn;
+            } else {
+                //Avoid using this in new browsers, as it is going away.
+                myvideo.src = window.URL.createObjectURL(mediaStreamOwn);
+            }
             localStreamOwn = mediaStreamOwn;
             document.getElementById('myVideoStreamHidden').style.display = "block";
         }).catch(function(err) { console.log(err.name + ": " + err.message); }); // always check for errors at the end.
@@ -68,14 +99,47 @@ $(document).ready(function()  {
 
     //Show the peer stream.
     function showTheirStream() {
+        //Older browsers might not implement mediaDevices at all, so we set an empty object first.
+        if (navigator.mediaDevices === undefined) {
+            navigator.mediaDevices = {};
+        }
+
+        //Some browsers partially implement mediaDevices. We can't just assign an object with getUserMedia as it would overwrite existing properties.
+        //Here, we will just add the getUserMedia property if it's missing.
+        if (navigator.mediaDevices.getUserMedia === undefined) {
+            navigator.mediaDevices.getUserMedia = function(constraints) {
+
+                //First get ahold of the legacy getUserMedia, if present.
+                var getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+
+                //Some browsers just don't implement it - return a rejected promise with an error to keep a consistent interface.
+                if (!getUserMedia) {
+                    return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
+                }
+
+                //Otherwise, wrap the call to the old navigator.getUserMedia with a Promise.
+                return new Promise(function(resolve, reject) {
+                    getUserMedia.call(navigator, constraints, resolve, reject);
+                });
+            }
+        }
+
         navigator.mediaDevices.getUserMedia(constraints2).then(function(mediaStreamOwn) {
             var theirvideo = document.querySelector('#theirvideo');
-            theirvideo.srcObject = mediaStreamOwn;
+            //Older browsers may not have srcObject.
+            if ("srcObject" in video) {
+                theirvideo.srcObject = mediaStreamOwn;
+            } else {
+                //Avoid using this in new browsers, as it is going away.
+                theirvideo.src = window.URL.createObjectURL(mediaStreamOwn);
+            }
             localStreamTheir = mediaStreamOwn;
             var call = peer.call(document.getElementById('calltoid').value, mediaStreamOwn);
+
             call.on('theirvideo', function(RemoteStream) {
                 $('#theirvideo').prop('src', URL.createObjectURL(remoteStream));
             })
+
             document.getElementById('theirVideoStreamHidden').style.display = "block";
         }).catch(function(err) { console.log(err.name + ": " + err.message); }); // always check for errors at the end.
 
@@ -111,13 +175,13 @@ $(document).ready(function()  {
 
     //Mudar/apagar.
     //To play the video.
-    $('video source').each(function(i, video) {
+    /*$('video source').each(function(i, video) {
         var videoData = $(video).attr('data-src');
         $(video).attr('src', videoData);
-    });
+    });*/
 
 
-    //Transform the name of the video in base 64, to improve delivery of files. getBase64FromVideoURL
+    //Transform the name of the video in base 64, to improve delivery of files. 
     function getBase64FromVideoURL(url, done) {
         //var video = document.getElementById("video");
         var video = document.createElement("video");
@@ -323,7 +387,7 @@ $(document).ready(function()  {
                         var currentVideo = video[idx];
                         var videoOptions = {};
 
-                        //Debug, apagar depois.
+                        //Debug, apagar depois. Aqui dá erro do datasrc == null. EMANUEL.
                         console.log(currentVideo.getAttribute('data-src'));
                         var datasrc = currentVideo.getAttribute('data-src');
                         var hashens = datasrc.hashCode();

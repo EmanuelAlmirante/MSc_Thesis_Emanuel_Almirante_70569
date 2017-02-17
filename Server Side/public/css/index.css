@@ -28,7 +28,7 @@
     height: 50px;
 }
 
-#stopstream {
+#stopownstream {
     position: absolute;
     top: 70%;
     left: 9%;
@@ -52,8 +52,22 @@
     height: 50px;
 }
 
+#stoptheirstream {
+    position: absolute;
+    top: 70%;
+    left: 36%;
+    width: 120px;
+    height: 50px;
+}
+
 #myVideoStreamHidden {
     position: absolute;
     top: 80%;
     left: 4.5%;
+}
+
+#theirVideoStreamHidden {
+    position: absolute;
+    top: 80%;
+    left: 50%;
 }

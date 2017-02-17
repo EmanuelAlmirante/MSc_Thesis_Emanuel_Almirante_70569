@@ -21,72 +21,84 @@ $(document).ready(function()  {
     });
 
     //Compatibility shim.
-    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-
-    //Receiving a call.
-    peer.on('call', function(call) {
-        //Answer the call automatically.
-        call.answer(window.localStream);
-        displayStreamOfId(call);
-    });
-
-    function startStream() {
-        //Show the div where the video is.
-        document.getElementById('myVideoStreamHidden').style.display = "block";
-        //Get audio/video stream.
-        navigator.getUserMedia({ audio: true, video: true }, function(stream) {
-            //Set your video displays.
-            $('#myvideo').prop('src', URL.createObjectURL(stream));
-
-            window.localStream = stream;
-
-            console.log(peer.id);
-            reset();
-        }, function() { $('#startStreamerror').show(); });
-    };
+    //navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+    var constraints1 = { audio: true, video: true };
+    var constraints2 = { audio: false, video: true };
 
     //Begins the stream of the user. Basically, gets its video and audio and displays.
+    function startStream() {
+        navigator.mediaDevices.getUserMedia(constraints1).then(function(mediaStreamOwn) {
+            var myvideo = document.querySelector('#myvideo');
+            myvideo.srcObject = mediaStreamOwn;
+            localStreamOwn = mediaStreamOwn;
+            document.getElementById('myVideoStreamHidden').style.display = "block";
+        }).catch(function(err) { console.log(err.name + ": " + err.message); }); // always check for errors at the end.
+
+    };
+
     $('#startstream').click(function() {
         //Initiate stream.
         startStream();
     });
 
-    //Stops the stream.
-    function stopStream() {
+    //Stops users own stream.
+    function stopOwnStream() {
         //Hide the div where the video is.
         document.getElementById('myVideoStreamHidden').style.display = "none";
-        localStream.getVideoTracks()[0].stop();
-        localStream.getAudioTracks()[0].stop();
+        localStreamOwn.getVideoTracks()[0].stop();
+        localStreamOwn.getAudioTracks()[0].stop();
     };
 
-    $('#stopstream').click(function() {
-        stopStream();
+    $('#stopownstream').click(function() {
+        stopOwnStream();
     });
 
-
-    function reset() {
-        $('#startStream, #displayStreamOfId').hide();
-        $('#reset').show();
-    }
-
-    function displayStreamOfId(call) {
-        //Hang up on an existing call if present.
+    function stopTheirStream() {
+        //Hide the div where the video is.
+        document.getElementById('theirVideoStreamHidden').style.display = "none";
+        localStreamTheir.getVideoTracks()[0].stop(); //CHANGE EMANUEL.
         if (window.existingCall) {
             window.existingCall.close();
-        }
+        };
+    };
 
-        //Wait for stream on the call, then set peer video display.
-        call.on('stream', function(stream) {
-            $('#their-video').prop('src', URL.createObjectURL(stream));
+    $('#stoptheirstream').click(function() {
+        stopTheirStream();
+    });
+
+    //Show the peer stream.
+    function showTheirStream() {
+        navigator.mediaDevices.getUserMedia(constraints2).then(function(mediaStreamOwn) {
+            var theirvideo = document.querySelector('#theirvideo');
+            theirvideo.srcObject = mediaStreamOwn;
+            localStreamTheir = mediaStreamOwn;
+            var call = peer.call(document.getElementById('calltoid').value, mediaStreamOwn);
+            call.on('theirvideo', function(RemoteStream) {
+                $('#theirvideo').prop('src', URL.createObjectURL(remoteStream));
+            })
+            document.getElementById('theirVideoStreamHidden').style.display = "block";
+        }).catch(function(err) { console.log(err.name + ": " + err.message); }); // always check for errors at the end.
+
+        peer.on('call', function(call) {
+            navigator.mediaDevices.getUserMedia(constraints2).then(function(mediaStreamOwn) {
+                var theirvideo = document.querySelector('#theirvideo');
+                theirvideo.srcObject = mediaStreamOwn;
+                localStreamTheir = mediaStreamOwn;
+                call.answer(mediaStreamOwn); // Answer the call with an audio stream.
+                call.on('stream', function(remoteStream) {
+                    $('#theirvideo').prop('src', URL.createObjectURL(remoteStream));
+                })
+                document.getElementById('theirVideoStreamHidden').style.display = "block";
+            }).catch(function(err) { console.log(err.name + ": " + err.message); }); // always check for errors at the end.*/
         });
 
-        //UI stuff.
-        window.existingCall = call;
-        $('#their-id').text(call.peer);
-        call.on('close', step2);
-        $('#step1, #step2').hide();
-        $('#step3').show();
     }
+
+    $('#submitcalltoid').click(function() {
+        showTheirStream();
+    });
+
+    /*WORKING FINE UNTIL HERE! EMANUEL.*/
 
     /*End of the collaboration part of the project. */
 
@@ -99,10 +111,10 @@ $(document).ready(function()  {
 
     //Mudar/apagar.
     //To play the video.
-    /*$('video source').each(function(i, video) {
+    $('video source').each(function(i, video) {
         var videoData = $(video).attr('data-src');
         $(video).attr('src', videoData);
-    });*/
+    });
 
 
     //Transform the name of the video in base 64, to improve delivery of files. getBase64FromVideoURL

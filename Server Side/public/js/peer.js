@@ -440,13 +440,14 @@
         Negotiator.startConnection = function(connection, options) {
             var pc = Negotiator._getPeerConnection(connection, options);
 
+            // Set the connection's PC.
+            connection.pc = connection.peerConnection = pc;
+
             if (connection.type === 'media' && options._stream) {
                 // Add the stream.
                 pc.addStream(options._stream);
             }
 
-            // Set the connection's PC.
-            connection.pc = connection.peerConnection = pc;
             // What do we need to do now?
             if (options.originator) {
                 if (connection.type === 'data') {
@@ -609,7 +610,7 @@
 
             // MEDIACONNECTION.
             util.log('Listening for remote stream');
-            pc.onaddstream = function(evt) {
+            pc.ontrack = function(evt) {
                 util.log('Received remote stream');
                 var stream = evt.stream;
                 var connection = provider.getConnection(peerId, connectionId);

@@ -71,3 +71,9 @@
     top: 80%;
     left: 50%;
 }
+
+#myTheirVideoStreamHidden {
+    position: absolute;
+    top: 80%;
+    left: 100%;
+}

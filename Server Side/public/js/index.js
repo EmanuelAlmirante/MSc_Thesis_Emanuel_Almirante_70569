@@ -20,13 +20,12 @@ $(document).ready(function()  {
         $('#id').text(peer.id);
     });
 
-    //Compatibility shim.
-    //navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
     var constraints1 = { audio: true, video: true };
     var constraints2 = { audio: false, video: true };
 
     //Begins the stream of the user. Basically, gets its video and audio and displays.
     function startStream() {
+
         //Older browsers might not implement mediaDevices at all, so we set an empty object first.
         if (navigator.mediaDevices === undefined) {
             navigator.mediaDevices = {};
@@ -35,7 +34,7 @@ $(document).ready(function()  {
         //Some browsers partially implement mediaDevices. We can't just assign an object with getUserMedia as it would overwrite existing properties.
         //Here, we will just add the getUserMedia property if it's missing.
         if (navigator.mediaDevices.getUserMedia === undefined) {
-            navigator.mediaDevices.getUserMedia = function(constraints) {
+            navigator.mediaDevices.getUserMedia = function(constraints1) {
 
                 //First get ahold of the legacy getUserMedia, if present.
                 var getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
@@ -47,22 +46,27 @@ $(document).ready(function()  {
 
                 //Otherwise, wrap the call to the old navigator.getUserMedia with a Promise.
                 return new Promise(function(resolve, reject) {
-                    getUserMedia.call(navigator, constraints, resolve, reject);
+                    getUserMedia.call(navigator, constraints1, resolve, reject);
                 });
             }
         }
 
-        navigator.mediaDevices.getUserMedia(constraints1).then(function(mediaStreamOwn) {
+        navigator.mediaDevices.getUserMedia(constraints1).then(function(stream) {
+
             var myvideo = document.querySelector('#myvideo');
+
             //Older browsers may not have srcObject.
-            if ("srcObject" in video) {
-                myvideo.srcObject = mediaStreamOwn;
+            if ("srcObject" in myvideo) {
+                myvideo.srcObject = stream;
             } else {
                 //Avoid using this in new browsers, as it is going away.
-                myvideo.src = window.URL.createObjectURL(mediaStreamOwn);
+                myvideo.src = window.URL.createObjectURL(stream);
             }
-            localStreamOwn = mediaStreamOwn;
+
+            window.localStreamOwn = stream;
+
             document.getElementById('myVideoStreamHidden').style.display = "block";
+
         }).catch(function(err) { console.log(err.name + ": " + err.message); }); // always check for errors at the end.
 
     };
@@ -72,32 +76,37 @@ $(document).ready(function()  {
         startStream();
     });
 
+    /*WORKING FINE UNTIL HERE! EMANUEL.*/
+
     //Stops users own stream.
     function stopOwnStream() {
         //Hide the div where the video is.
         document.getElementById('myVideoStreamHidden').style.display = "none";
         localStreamOwn.getVideoTracks()[0].stop();
         localStreamOwn.getAudioTracks()[0].stop();
+        //If a peer stops streaming it must disconnect from all peers. NOT WORKING. EMANUEL.
+        if (window.existingCall) {
+            window.existingCall.close(); //NEED TO CHANGE. EMANUEL. NEED TO DO window.existingCall = call; IN showTheirStream?
+        };
     };
 
     $('#stopownstream').click(function() {
         stopOwnStream();
     });
 
-    function stopTheirStream() {
+    function stopTheirStream() { //NEED TO CHANGE. EMANUEL.
         //Hide the div where the video is.
         document.getElementById('theirVideoStreamHidden').style.display = "none";
-        localStreamTheir.getVideoTracks()[0].stop(); //CHANGE EMANUEL.
-        if (window.existingCall) {
-            window.existingCall.close();
-        };
+        localStreamOwnTheir.getVideoTracks()[0].stop();
+        localStreamTheir.getVideoTracks()[0].stop();
+        localStreamTheir.getAudioTracks()[0].stop();
     };
 
     $('#stoptheirstream').click(function() {
         stopTheirStream();
     });
 
-    //Show the peer stream.
+    //To make a connection to see the stream of the other peer.
     function showTheirStream() {
         //Older browsers might not implement mediaDevices at all, so we set an empty object first.
         if (navigator.mediaDevices === undefined) {
@@ -107,7 +116,7 @@ $(document).ready(function()  {
         //Some browsers partially implement mediaDevices. We can't just assign an object with getUserMedia as it would overwrite existing properties.
         //Here, we will just add the getUserMedia property if it's missing.
         if (navigator.mediaDevices.getUserMedia === undefined) {
-            navigator.mediaDevices.getUserMedia = function(constraints) {
+            navigator.mediaDevices.getUserMedia = function(constraints2) {
 
                 //First get ahold of the legacy getUserMedia, if present.
                 var getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
@@ -119,50 +128,62 @@ $(document).ready(function()  {
 
                 //Otherwise, wrap the call to the old navigator.getUserMedia with a Promise.
                 return new Promise(function(resolve, reject) {
-                    getUserMedia.call(navigator, constraints, resolve, reject);
+                    getUserMedia.call(navigator, constraints2, resolve, reject);
                 });
             }
         }
+        navigator.mediaDevices.getUserMedia(constraints2).then(function(stream) {
 
-        navigator.mediaDevices.getUserMedia(constraints2).then(function(mediaStreamOwn) {
-            var theirvideo = document.querySelector('#theirvideo');
+            var mytheirvideo = document.querySelector('#mytheirvideo');
+
             //Older browsers may not have srcObject.
-            if ("srcObject" in video) {
-                theirvideo.srcObject = mediaStreamOwn;
+            if ("srcObject" in mytheirvideo) {
+                mytheirvideo.srcObject = stream;
             } else {
                 //Avoid using this in new browsers, as it is going away.
-                theirvideo.src = window.URL.createObjectURL(mediaStreamOwn);
+                mytheirvideo.src = window.URL.createObjectURL(stream);
             }
-            localStreamTheir = mediaStreamOwn;
-            var call = peer.call(document.getElementById('calltoid').value, mediaStreamOwn);
 
-            call.on('theirvideo', function(RemoteStream) {
+            window.localStreamOwnTheir = stream;
+
+            var call = peer.call(document.getElementById('calltoid').value, stream);
+
+            window.existingCall = call;
+
+            call.on('stream', function(remoteStream) {
+                console.log(remoteStream);
                 $('#theirvideo').prop('src', URL.createObjectURL(remoteStream));
-            })
+                window.localStreamTheir = remoteStream;
+            });
 
             document.getElementById('theirVideoStreamHidden').style.display = "block";
-        }).catch(function(err) { console.log(err.name + ": " + err.message); }); // always check for errors at the end.
 
-        peer.on('call', function(call) {
-            navigator.mediaDevices.getUserMedia(constraints2).then(function(mediaStreamOwn) {
-                var theirvideo = document.querySelector('#theirvideo');
-                theirvideo.srcObject = mediaStreamOwn;
-                localStreamTheir = mediaStreamOwn;
-                call.answer(mediaStreamOwn); // Answer the call with an audio stream.
-                call.on('stream', function(remoteStream) {
-                    $('#theirvideo').prop('src', URL.createObjectURL(remoteStream));
-                })
-                document.getElementById('theirVideoStreamHidden').style.display = "block";
-            }).catch(function(err) { console.log(err.name + ": " + err.message); }); // always check for errors at the end.*/
+        }).catch(function(err) { console.log(err.name + ": " + err.message); }); // always check for errors at the end.
+    };
+
+    //To answer a call received.
+    peer.on('call', function(call) {
+
+        call.answer(window.localStreamOwn); //Answer the call with an audio stream.
+
+        //Hang up on an existing call if present.
+        if (window.existingCall) {
+            window.existingCall.close();
+        }
+
+        call.on('stream', function(remoteStream) {
+            $('#theirvideo').window('src', URL.createObjectURL(remoteStream));
+            localStreamTheir = remoteStream;
         });
 
-    }
+        document.getElementById('theirVideoStreamHidden').style.display = "block";
+
+    }); // always check for errors at the end.
+
 
     $('#submitcalltoid').click(function() {
         showTheirStream();
     });
-
-    /*WORKING FINE UNTIL HERE! EMANUEL.*/
 
     /*End of the collaboration part of the project. */
 
@@ -182,7 +203,7 @@ $(document).ready(function()  {
 
 
     //Transform the name of the video in base 64, to improve delivery of files. 
-    function getBase64FromVideoURL(url, done) {
+    /*function getBase64FromVideoURL(url, done) {
         //var video = document.getElementById("video");
         var video = document.createElement("video");
         //video.setAttribute("src", url);
@@ -421,7 +442,7 @@ $(document).ready(function()  {
                 }
             }
         }, 500);
-    };
+    };*/
     /*End of the video peerCDN part of the project.*/
 
 });

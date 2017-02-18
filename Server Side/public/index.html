@@ -17,7 +17,7 @@
 
     <link rel="stylesheet" href="css/index.css" type="text/css">
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js" defer></script>
-    <script type="text/javascript" src="/js/peer.min.js" defer></script>
+    <script type="text/javascript" src="/js/peer.js" defer></script>
     <script type="text/javascript" src="/js/index.js" defer></script>
 
 </head>
@@ -45,7 +45,6 @@
 
     <button id="startstream">Start your own stream (click)</button>
     <button id="stopownstream">Stop your own stream (click)</button>
-    <!-- I have to complete this! EMANUEL. -->
     <input id="calltoid" type="text" placeholder="ID of the stream" />
     <input id="submitcalltoid" type="submit" value="Connect">
     <button id="stoptheirstream">Stop their stream (click)</button>
@@ -58,6 +57,8 @@
         <video id="theirvideo" autoplay></video>
     </div>
 
-</body>
+    <div id="myTheirVideoStreamHidden" class="theirVideoStream" style="display:none;" </body>
+        <video id="mytheirvideo" autoplay></video>
+    </div>
 
 </html>

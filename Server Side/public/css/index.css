@@ -74,14 +74,3 @@
     width: 500px;
     height: 500px;
 }
-
-#myTheirVideoStreamHidden {
-    position: absolute;
-    top: 1000px;
-    left: 0px
-}
-
-#mytheirvideo {
-    width: 0px;
-    height: 0px;
-}

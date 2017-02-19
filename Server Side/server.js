@@ -24,7 +24,7 @@ var server = app.listen(8000, function() {
 var options = {
     debug: true,
     allowDiscovery: true,
-    allow_discovery: true
+    allow_discovery: true,
 }
 
 app.use('/peerjs', ExpressPeerServer(server, options));

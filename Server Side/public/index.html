@@ -17,7 +17,7 @@
 
     <link rel="stylesheet" href="css/index.css" type="text/css">
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js" defer></script>
-    <script type="text/javascript" src="/js/peer.js" defer></script>
+    <script type="text/javascript" src="/js/peer.min.js" defer></script>
     <script type="text/javascript" src="/js/index.js" defer></script>
 
 </head>
@@ -42,11 +42,7 @@
     </div>
 
     <div id="theirVideoStreamHidden" class="theirVideoStream" style="display:none;">
-        <video id="theirvideo" autoplay></video>
-    </div>
-
-    <div id="myTheirVideoStreamHidden" class="theirVideoStream" style="display:none;">
-        <video id="mytheirvideo" autoplay></video>
+        <video id="theirvideo" autoplay mute></video>
     </div>
 
 </body>

@@ -1,7 +1,5 @@
-$(document).ready(function()  {
-    var connections = {};
-    var runned = false;
-    var interval;
+    // Compatibility shim
+    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
     //Gets the ID from the server and creates a PeerJS object.
     var peer = new Peer({
@@ -20,43 +18,51 @@ $(document).ready(function()  {
         $('#id').text(peer.id);
     });
 
-    // Compatibility shim
-    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+    //The problem is here too.
+    peer.on('call', function(call) {
 
-    $(function() {
+        //Answer the call automatically (instead of prompting user) for demo purposes.
+        call.answer(window.localStream);
 
-        startStream();
+        //dealWithCalls(call);
 
-        //Initiate stream.
-        $('#startstream').click(function() {
+    });
 
-            document.getElementById('myVideoStreamHidden').style.display = "block";
-            document.getElementById('myvideo').muted = false;
+    peer.on('error', function(err) {
 
-        });
+        alert(err.message);
 
-        //Terminate stream.
-        $('#stopownstream').click(function() {
+    });
 
-            stopOwnStream();
+    $('#submitcalltoid').click(function() {
 
-        });
+        var constraints = { audio: false, video: true };
 
-        //Terminate stream we are watching.
-        $('#stoptheirstream').click(function() {
+        navigator.getUserMedia(constraints, function(NULL) {
 
-            stopTheirStream();
+            $('#mytheirvideo').prop('src', URL.createObjectURL(NULL));
 
-        });
+            window.localStreamVideo = NULL;
 
-        $('#submitcalltoid').click(function() {
+            var call = peer.call(document.getElementById('calltoid').value, NULL);
 
-            showTheirStream();
+            document.getElementById('theirVideoStreamHidden').style.display = "block";
 
-        })
+            call.on('stream', function(remoteStream) {
 
+                $('#theirvideo').prop('src', URL.createObjectURL(remoteStream));
+                window.remoteTheirStream = remoteStream;
 
-    })
+            });
+
+            window.existingCall = call;
+
+        }, function(err) { console.log(err.name + ": " + err.message); });
+
+        dealWithCalls(call);
+
+    });
+
 
     //Begins the stream of the user. Basically, gets its video and audio and displays to the user.
     function startStream() {
@@ -67,9 +73,18 @@ $(document).ready(function()  {
 
             $('#myvideo').prop('src', URL.createObjectURL(stream));
             window.localStream = stream;
+            document.getElementById('myVideoStreamHidden').style.display = "block";
+            document.getElementById('myvideo').muted = false;
 
         }, function(err) { console.log(err.name + ": " + err.message); });
     };
+
+    //Initiate stream.
+    $('#startstream').click(function() {
+
+        startStream();
+
+    });
 
     //Stops users own stream. NEED TO ADD TO STOP ALL PEOPLE STREAMING TO IT.
     function stopOwnStream() {
@@ -84,46 +99,38 @@ $(document).ready(function()  {
 
     };
 
+    //Terminate stream.
+    $('#stopownstream').click(function() {
+
+        stopOwnStream();
+
+    });
+
+
     //It stops the stream that we are watching.
     function stopTheirStream() {
         //TODO ALL
     };
 
-    //The problem is here.
-    function showTheirStream() {
+    //Terminate stream we are watching.
+    $('#stoptheirstream').click(function() {
 
-        var constraints = { audio: false, video: true };
+        stopTheirStream();
 
-        var call = peer.call(document.getElementById('calltoid').value, window.localStream);
-        console.log(call);
+    });
 
-        call.on('stream', function(remoteStream) {
-            console.log('emanuel')
-            $('#theirvideo').prop('src', URL.createObjectURL(remoteStream));
-            document.getElementById('theirVideoStreamHidden').style.display = "block";
-            window.remoteTheirStream = remoteStream;
+    function dealWithCalls(call) {
 
+        // Wait for stream on the call, then set peer video display
+        call.on('stream', function(stream) {
+            $('#theirvideo').prop('src', URL.createObjectURL(stream));
         });
 
+        // UI stuff
         window.existingCall = call;
 
-    };
+    }
 
-    //The problem is here too.
-    peer.on('call', function(call) {
-
-        call.answer(window.localStream);
-
-        call.on('stream', function(remoteStream) {
-
-            $('#theirvideo').prop('src', URL.createObjectURL(remoteStream));
-            window.remoteTheirStream = remoteStream;
-
-        });
-
-        window.existingCall = call;
-
-    })
 
     /*End of the collaboration part of the project. */
 
@@ -133,6 +140,11 @@ $(document).ready(function()  {
 
 
     /*Beginning of the video peerCDN part of the project.*/
+
+
+    //var runned = false;
+    //var interval;
+
 
     //Mudar/apagar.
     //To play the video.
@@ -384,5 +396,3 @@ $(document).ready(function()  {
         }, 500);
     };*/
     /*End of the video peerCDN part of the project.*/
-
-});

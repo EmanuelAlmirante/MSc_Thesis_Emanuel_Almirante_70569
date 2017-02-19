@@ -20,171 +20,110 @@ $(document).ready(function()  {
         $('#id').text(peer.id);
     });
 
-    var constraints1 = { audio: true, video: true };
-    var constraints2 = { audio: false, video: true };
+    // Compatibility shim
+    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
-    //Begins the stream of the user. Basically, gets its video and audio and displays.
-    function startStream() {
+    $(function() {
 
-        //Older browsers might not implement mediaDevices at all, so we set an empty object first.
-        if (navigator.mediaDevices === undefined) {
-            navigator.mediaDevices = {};
-        }
+        startStream();
 
-        //Some browsers partially implement mediaDevices. We can't just assign an object with getUserMedia as it would overwrite existing properties.
-        //Here, we will just add the getUserMedia property if it's missing.
-        if (navigator.mediaDevices.getUserMedia === undefined) {
-            navigator.mediaDevices.getUserMedia = function(constraints1) {
-
-                //First get ahold of the legacy getUserMedia, if present.
-                var getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-
-                //Some browsers just don't implement it - return a rejected promise with an error to keep a consistent interface.
-                if (!getUserMedia) {
-                    return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
-                }
-
-                //Otherwise, wrap the call to the old navigator.getUserMedia with a Promise.
-                return new Promise(function(resolve, reject) {
-                    getUserMedia.call(navigator, constraints1, resolve, reject);
-                });
-            }
-        }
-
-        navigator.mediaDevices.getUserMedia(constraints1).then(function(stream) {
-
-            var myvideo = document.querySelector('#myvideo');
-
-            //Older browsers may not have srcObject.
-            if ("srcObject" in myvideo) {
-                myvideo.srcObject = stream;
-            } else {
-                //Avoid using this in new browsers, as it is going away.
-                myvideo.src = window.URL.createObjectURL(stream);
-            }
-
-            window.localStreamOwn = stream;
+        //Initiate stream.
+        $('#startstream').click(function() {
 
             document.getElementById('myVideoStreamHidden').style.display = "block";
+            document.getElementById('myvideo').muted = false;
 
-        }).catch(function(err) { console.log(err.name + ": " + err.message); }); // always check for errors at the end.
-
-    };
-
-    $('#startstream').click(function() {
-        //Initiate stream.
-        startStream();
-    });
-
-    /*WORKING FINE UNTIL HERE! EMANUEL.*/
-
-    //Stops users own stream.
-    function stopOwnStream() {
-        //Hide the div where the video is.
-        document.getElementById('myVideoStreamHidden').style.display = "none";
-        localStreamOwn.getVideoTracks()[0].stop();
-        localStreamOwn.getAudioTracks()[0].stop();
-        //If a peer stops streaming it must disconnect from all peers. NOT WORKING. EMANUEL.
-        if (window.existingCall) {
-            window.existingCall.close(); //NEED TO CHANGE. EMANUEL. NEED TO DO window.existingCall = call; IN showTheirStream?
-        };
-    };
-
-    $('#stopownstream').click(function() {
-        stopOwnStream();
-    });
-
-    function stopTheirStream() { //NEED TO CHANGE. EMANUEL.
-        //Hide the div where the video is.
-        document.getElementById('theirVideoStreamHidden').style.display = "none";
-        localStreamOwnTheir.getVideoTracks()[0].stop();
-        localStreamTheir.getVideoTracks()[0].stop();
-        localStreamTheir.getAudioTracks()[0].stop();
-    };
-
-    $('#stoptheirstream').click(function() {
-        stopTheirStream();
-    });
-
-    //To make a connection to see the stream of the other peer.
-    function showTheirStream() {
-        console.log('show their stream');
-        //Older browsers might not implement mediaDevices at all, so we set an empty object first.
-        if (navigator.mediaDevices === undefined) {
-            navigator.mediaDevices = {};
-        }
-
-        //Some browsers partially implement mediaDevices. We can't just assign an object with getUserMedia as it would overwrite existing properties.
-        //Here, we will just add the getUserMedia property if it's missing.
-        if (navigator.mediaDevices.getUserMedia === undefined) {
-            navigator.mediaDevices.getUserMedia = function(constraints2) {
-
-                //First get ahold of the legacy getUserMedia, if present.
-                var getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-
-                //Some browsers just don't implement it - return a rejected promise with an error to keep a consistent interface.
-                if (!getUserMedia) {
-                    return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
-                }
-
-                //Otherwise, wrap the call to the old navigator.getUserMedia with a Promise.
-                return new Promise(function(resolve, reject) {
-                    getUserMedia.call(navigator, constraints2, resolve, reject);
-                });
-            }
-        }
-        console.log('navigator.mediaDevices Emanuel');
-        navigator.mediaDevices.getUserMedia(constraints2).then(function(stream) {
-            console.log('navigator.mediaDevices2 Emanuel');
-
-            var mytheirvideo = document.querySelector('#mytheirvideo');
-
-            //Older browsers may not have srcObject.
-            if ("srcObject" in mytheirvideo) {
-                mytheirvideo.srcObject = stream;
-            } else {
-                //Avoid using this in new browsers, as it is going away.
-                mytheirvideo.src = window.URL.createObjectURL(stream);
-            }
-            console.log('localStreamOwnTheir Emanuel');
-            window.localStreamOwnTheir = stream;
-
-            var call = peer.call(document.getElementById('calltoid').value, stream);
-            console.log('call Emanuel');
-            window.existingCall = call;
-
-            call.on('stream', function(remoteStream) {
-                $('#theirvideo').prop('src', URL.createObjectURL(remoteStream));
-                window.localStreamTheir = remoteStream;
-            });
-            console.log('call.on( Emanuel');
-            document.getElementById('theirVideoStreamHidden').style.display = "block";
-            console.log(' document.getElementById Emanuel');
-
-        }).catch(function(err) { console.log(err.name + ": " + err.message); }); // always check for errors at the end.
-    };
-
-    //To answer a call received.
-    peer.on('call', function(call) {
-
-        call.answer(window.localStreamOwn); //Answer the call with an audio stream.
-
-        //Hang up on an existing call if present.
-        if (window.existingCall) {
-            window.existingCall.close();
-        }
-
-        call.on('stream', function(remoteStream) {
-            $('#theirvideo').window('src', URL.createObjectURL(remoteStream));
-            localStreamTheir = remoteStream;
         });
 
-    });
+        //Terminate stream.
+        $('#stopownstream').click(function() {
+
+            stopOwnStream();
+
+        });
+
+        //Terminate stream we are watching.
+        $('#stoptheirstream').click(function() {
+
+            stopTheirStream();
+
+        });
+
+        $('#submitcalltoid').click(function() {
+
+            showTheirStream();
+
+        })
 
 
-    $('#submitcalltoid').click(function() {
-        showTheirStream();
-    });
+    })
+
+    //Begins the stream of the user. Basically, gets its video and audio and displays to the user.
+    function startStream() {
+
+        var constraints = { audio: true, video: true };
+
+        navigator.getUserMedia(constraints, function(stream) {
+
+            $('#myvideo').prop('src', URL.createObjectURL(stream));
+            window.localStream = stream;
+
+        }, function(err) { console.log(err.name + ": " + err.message); });
+    };
+
+    //Stops users own stream. NEED TO ADD TO STOP ALL PEOPLE STREAMING TO IT.
+    function stopOwnStream() {
+
+        //Hide the div where the video is.
+        document.getElementById('myVideoStreamHidden').style.display = "none";
+        //Stops the video and audio tracks.
+        localStream.stop();
+
+
+        //TODO ADD CLOSE ALL CALLS.
+
+    };
+
+    //It stops the stream that we are watching.
+    function stopTheirStream() {
+        //TODO ALL
+    };
+
+    //The problem is here.
+    function showTheirStream() {
+
+        var constraints = { audio: false, video: true };
+
+        var call = peer.call(document.getElementById('calltoid').value, window.localStream);
+        console.log(call);
+
+        call.on('stream', function(remoteStream) {
+            console.log('emanuel')
+            $('#theirvideo').prop('src', URL.createObjectURL(remoteStream));
+            document.getElementById('theirVideoStreamHidden').style.display = "block";
+            window.remoteTheirStream = remoteStream;
+
+        });
+
+        window.existingCall = call;
+
+    };
+
+    //The problem is here too.
+    peer.on('call', function(call) {
+
+        call.answer(window.localStream);
+
+        call.on('stream', function(remoteStream) {
+
+            $('#theirvideo').prop('src', URL.createObjectURL(remoteStream));
+            window.remoteTheirStream = remoteStream;
+
+        });
+
+        window.existingCall = call;
+
+    })
 
     /*End of the collaboration part of the project. */
 

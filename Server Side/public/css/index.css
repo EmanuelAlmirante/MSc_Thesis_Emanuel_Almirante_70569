@@ -1,79 +1,87 @@
-#canvas {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    height: 100%;
-}
-
 .stats {
     position: absolute;
-    left: 67%;
+    left: 1050px;
     width: 500px;
     height: 50px;
 }
 
 #video {
     position: absolute;
+    top: 10px;
+    left: 8px;
     width: 1000px;
     height: 500px;
 }
 
 #startstream {
     position: absolute;
-    top: 70%;
+    top: 530px;
+    left: 8px;
     width: 120px;
-    height: 50px;
+    height: 40px;
 }
 
 #stopownstream {
     position: absolute;
-    top: 70%;
-    left: 9%;
+    top: 530px;
+    left: 140px;
     width: 120px;
-    height: 50px;
+    height: 40px;
 }
 
 #calltoid {
     position: absolute;
-    top: 70%;
-    left: 18%;
+    top: 530px;
+    left: 272px;
     width: 120px;
-    height: 45px;
+    height: 18px;
 }
 
 #submitcalltoid {
     position: absolute;
-    top: 70%;
-    left: 27%;
+    top: 530px;
+    left: 404px;
     width: 120px;
-    height: 50px;
+    height: 40px;
 }
 
 #stoptheirstream {
     position: absolute;
-    top: 70%;
-    left: 36%;
+    top: 530px;
+    left: 536px;
     width: 120px;
-    height: 50px;
+    height: 40px;
 }
 
 #myVideoStreamHidden {
     position: absolute;
-    top: 80%;
-    left: 4.5%;
+    top: 575px;
+    left: 8px;
+}
+
+#myvideo {
+    width: 500px;
+    height: 500px;
 }
 
 #theirVideoStreamHidden {
     position: absolute;
-    top: 80%;
-    left: 50%;
+    top: 575px;
+    left: 520px
+}
+
+#theirvideo {
+    width: 500px;
+    height: 500px;
 }
 
 #myTheirVideoStreamHidden {
     position: absolute;
-    top: 80%;
-    left: 100%;
+    top: 1000px;
+    left: 0px
+}
+
+#mytheirvideo {
+    width: 0px;
+    height: 0px;
 }

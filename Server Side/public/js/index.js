@@ -108,6 +108,7 @@ $(document).ready(function()  {
 
     //To make a connection to see the stream of the other peer.
     function showTheirStream() {
+        console.log('show their stream');
         //Older browsers might not implement mediaDevices at all, so we set an empty object first.
         if (navigator.mediaDevices === undefined) {
             navigator.mediaDevices = {};
@@ -132,7 +133,9 @@ $(document).ready(function()  {
                 });
             }
         }
+        console.log('navigator.mediaDevices Emanuel');
         navigator.mediaDevices.getUserMedia(constraints2).then(function(stream) {
+            console.log('navigator.mediaDevices2 Emanuel');
 
             var mytheirvideo = document.querySelector('#mytheirvideo');
 
@@ -143,20 +146,20 @@ $(document).ready(function()  {
                 //Avoid using this in new browsers, as it is going away.
                 mytheirvideo.src = window.URL.createObjectURL(stream);
             }
-
+            console.log('localStreamOwnTheir Emanuel');
             window.localStreamOwnTheir = stream;
 
             var call = peer.call(document.getElementById('calltoid').value, stream);
-
+            console.log('call Emanuel');
             window.existingCall = call;
 
             call.on('stream', function(remoteStream) {
-                console.log(remoteStream);
                 $('#theirvideo').prop('src', URL.createObjectURL(remoteStream));
                 window.localStreamTheir = remoteStream;
             });
-
+            console.log('call.on( Emanuel');
             document.getElementById('theirVideoStreamHidden').style.display = "block";
+            console.log(' document.getElementById Emanuel');
 
         }).catch(function(err) { console.log(err.name + ": " + err.message); }); // always check for errors at the end.
     };
@@ -176,9 +179,7 @@ $(document).ready(function()  {
             localStreamTheir = remoteStream;
         });
 
-        document.getElementById('theirVideoStreamHidden').style.display = "block";
-
-    }); // always check for errors at the end.
+    });
 
 
     $('#submitcalltoid').click(function() {

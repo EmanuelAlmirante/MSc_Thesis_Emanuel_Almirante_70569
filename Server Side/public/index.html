@@ -24,20 +24,8 @@
 
 <body>
 
-    <canvas id="canvas"></canvas>
-
     <div class="stats">
         <p class="id">Your ID is: <span id="id"></span>
-        </p>
-        <p class="server">Server:
-            <span id="server-count">0</span> file(s) / <span id="server-size">0</span> bytes
-        </p>
-        <p class="peer">Peer:
-            <span id="peer-count">0</span> file(s) / <span id="peer-size">0</span> bytes
-        </p>
-        <ul id="peerlist"></ul>
-        <p class="streams">Streams available:
-            <ul id="streamlist"></ul>
         </p>
     </div>
 
@@ -57,8 +45,10 @@
         <video id="theirvideo" autoplay></video>
     </div>
 
-    <div id="myTheirVideoStreamHidden" class="theirVideoStream" style="display:none;" </body>
+    <div id="myTheirVideoStreamHidden" class="theirVideoStream" style="display:none;">
         <video id="mytheirvideo" autoplay></video>
     </div>
+
+</body>
 
 </html>

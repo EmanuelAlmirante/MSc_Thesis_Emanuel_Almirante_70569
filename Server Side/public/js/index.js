@@ -24,17 +24,44 @@
         //Answer the call automatically (instead of prompting user) for demo purposes.
         call.answer(window.localStream);
 
-        //dealWithCalls(call);
-
     });
 
+    //If there is an error.
     peer.on('error', function(err) {
 
         alert(err.message);
 
     });
 
-    $('#submitcalltoid').click(function() {
+    //Begins the stream of the user. Basically, gets its video and audio and displays to the user.
+    function startStream() {
+
+        var constraints = { audio: true, video: true };
+
+        navigator.getUserMedia(constraints, function(stream) {
+
+            $('#myvideo').prop('src', URL.createObjectURL(stream));
+            window.localStream = stream;
+            document.getElementById('myVideoStreamHidden').style.display = "block";
+            document.getElementById('myvideo').muted = false;
+
+        }, function(err) { console.log(err.name + ": " + err.message); });
+    };
+
+    //Stops users own stream. NEED TO ADD TO STOP ALL PEOPLE STREAMING TO IT.
+    function stopOwnStream() {
+
+        //Hide the div where the video is.
+        document.getElementById('myVideoStreamHidden').style.display = "none";
+        //Stops the video and audio tracks.
+        localStream.stop();
+
+        //TODO: CLOSE ALL CALLS.
+
+    };
+
+    //It connects and shows the stream we want. Is it possible to not ask for permissions?
+    function showTheirStream() {
 
         var constraints = { audio: false, video: true };
 
@@ -60,24 +87,34 @@
         }, function(err) { console.log(err.name + ": " + err.message); });
 
         dealWithCalls(call);
+    };
+
+    //It stops the stream that we are watching.
+    function stopTheirStream() {
+
+        //TODO ALL
+
+    };
+
+    function dealWithCalls(call) {
+
+        //Wait for stream on the call, then set peer video display.
+        call.on('stream', function(stream) {
+            $('#theirvideo').prop('src', URL.createObjectURL(stream));
+
+        });
+
+        window.existingCall = call;
+
+        //TODO: LIST WITH ALL CALLS, TO CLOSE IT AFTER.
+    };
+
+    $('#submitcalltoid').click(function() {
+
+        showTheirStream();
 
     });
 
-
-    //Begins the stream of the user. Basically, gets its video and audio and displays to the user.
-    function startStream() {
-
-        var constraints = { audio: true, video: true };
-
-        navigator.getUserMedia(constraints, function(stream) {
-
-            $('#myvideo').prop('src', URL.createObjectURL(stream));
-            window.localStream = stream;
-            document.getElementById('myVideoStreamHidden').style.display = "block";
-            document.getElementById('myvideo').muted = false;
-
-        }, function(err) { console.log(err.name + ": " + err.message); });
-    };
 
     //Initiate stream.
     $('#startstream').click(function() {
@@ -86,31 +123,12 @@
 
     });
 
-    //Stops users own stream. NEED TO ADD TO STOP ALL PEOPLE STREAMING TO IT.
-    function stopOwnStream() {
-
-        //Hide the div where the video is.
-        document.getElementById('myVideoStreamHidden').style.display = "none";
-        //Stops the video and audio tracks.
-        localStream.stop();
-
-
-        //TODO ADD CLOSE ALL CALLS.
-
-    };
-
     //Terminate stream.
     $('#stopownstream').click(function() {
 
         stopOwnStream();
 
     });
-
-
-    //It stops the stream that we are watching.
-    function stopTheirStream() {
-        //TODO ALL
-    };
 
     //Terminate stream we are watching.
     $('#stoptheirstream').click(function() {
@@ -119,17 +137,7 @@
 
     });
 
-    function dealWithCalls(call) {
 
-        // Wait for stream on the call, then set peer video display
-        call.on('stream', function(stream) {
-            $('#theirvideo').prop('src', URL.createObjectURL(stream));
-        });
-
-        // UI stuff
-        window.existingCall = call;
-
-    }
 
 
     /*End of the collaboration part of the project. */

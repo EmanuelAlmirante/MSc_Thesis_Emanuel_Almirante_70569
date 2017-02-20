@@ -3,26 +3,36 @@
 
     //Gets the ID from the server and creates a PeerJS object.
     var peer = new Peer({
+
         // host: '52.18.51.141', servidor online
         // port: 80, servidor online
         host: 'localhost',
         port: 8000,
         path: '/peerjs',
         debug: 3,
+
     });
 
     /*Beginning of the collaboration part of the project.*/
 
     // To show the ID of the peer.
     peer.on('open', function() {
+
         $('#id').text(peer.id);
+
     });
 
-    //The problem is here too.
+    //List to save all incoming calls that a peer receives.
+    var inCalls = [];
+
+    //When the peer receives a request to connect to it's stream.
     peer.on('call', function(call) {
 
         //Answer the call automatically (instead of prompting user) for demo purposes.
         call.answer(window.localStream);
+
+        //Adds a new incoming call to the incoming calls list.
+        inCalls.push(call);
 
     });
 
@@ -43,25 +53,38 @@
             $('#myvideo').prop('src', URL.createObjectURL(stream));
             window.localStream = stream;
             document.getElementById('myVideoStreamHidden').style.display = "block";
-            document.getElementById('myvideo').muted = false;
+
 
         }, function(err) { console.log(err.name + ": " + err.message); });
     };
 
     //Stops users own stream. NEED TO ADD TO STOP ALL PEOPLE STREAMING TO IT.
-    function stopOwnStream() {
-
+    function stopOwnStream(inCalls) {
+        console.log(inCalls);
         //Hide the div where the video is.
         document.getElementById('myVideoStreamHidden').style.display = "none";
+
         //Stops the video and audio tracks.
         localStream.stop();
 
-        //TODO: CLOSE ALL CALLS.
+        //Closes all the incoming calls.
+        for (var i = 0; i < inCalls.length; i++) {
+
+            inCalls[i].close();
+            console.log(inCalls[i]);
+
+        };
+
+        //Resets the list to save all incoming calls that a peer receives.
+        var inCalls = [];
 
     };
 
     //It connects and shows the stream we want. Is it possible to not ask for permissions?
     function showTheirStream() {
+
+        //List to save all outgoing calls that a peer does.
+        var outCalls = [];
 
         var constraints = { audio: false, video: true };
 
@@ -75,46 +98,46 @@
 
             document.getElementById('theirVideoStreamHidden').style.display = "block";
 
-            call.on('stream', function(remoteStream) {
+            call.on('stream', function(stream) {
 
-                $('#theirvideo').prop('src', URL.createObjectURL(remoteStream));
-                window.remoteTheirStream = remoteStream;
+                $('#theirvideo').prop('src', URL.createObjectURL(stream));
+                window.remoteTheirStream = stream;
 
             });
 
+            localStreamVideo.stop();
+
             window.existingCall = call;
+
+            //Adds a new outgoing call to the outgoing calls list.
+            outCalls.push(call);
+
+            var outCallsLength = outCalls.length;
 
         }, function(err) { console.log(err.name + ": " + err.message); });
 
-        dealWithCalls(call);
     };
+
 
     //It stops the stream that we are watching.
-    function stopTheirStream() {
+    function stopTheirStream(outCallsLength) {
+        console.log(outCallsLength);
+        //Hide the div where the video is.
+        document.getElementById('theirVideoStreamHidden').style.display = "none";
 
-        //TODO ALL
+        //Closes all the incoming calls.
+        for (var i = 0; i < outCallsLength; i++) {
+
+            outCalls[i].close();
+            console.log(outCalls[i]);
+
+        };
+
+        //Resets the list to save all outgoing calls that a peer does.
+        var outCalls = [];
+        console.log(outCalls);
 
     };
-
-    function dealWithCalls(call) {
-
-        //Wait for stream on the call, then set peer video display.
-        call.on('stream', function(stream) {
-            $('#theirvideo').prop('src', URL.createObjectURL(stream));
-
-        });
-
-        window.existingCall = call;
-
-        //TODO: LIST WITH ALL CALLS, TO CLOSE IT AFTER.
-    };
-
-    $('#submitcalltoid').click(function() {
-
-        showTheirStream();
-
-    });
-
 
     //Initiate stream.
     $('#startstream').click(function() {
@@ -130,15 +153,19 @@
 
     });
 
+    //Connects to a third party stream.
+    $('#submitcalltoid').click(function() {
+
+        showTheirStream();
+
+    });
+
     //Terminate stream we are watching.
     $('#stoptheirstream').click(function() {
 
         stopTheirStream();
 
     });
-
-
-
 
     /*End of the collaboration part of the project. */
 

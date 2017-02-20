@@ -27,6 +27,20 @@
     <div class="stats">
         <p class="id">Your ID is: <span id="id"></span>
         </p>
+        <p class="server">Server:
+            <span id="server-count">0</span> file(s) /
+            <span id="server-size">0</span> bytes
+        </p>
+        <p class="peer">Peer:
+            <span id="peer-count">0</span> file(s) /
+            <span id="peer-size">0</span> bytes
+        </p>
+        <ul id="peerlist">
+        </ul>
+        <p class="streams">Streams available:
+        </p>
+        <ul id="streamlist">
+        </ul>
     </div>
 
     <video id="video" data-src="/video/DonaldTrumpCallsConan.mp4" frameborder="0" allowfullscreen type="video/mp4" controls></video>
@@ -38,11 +52,11 @@
     <button id="stoptheirstream">Stop their stream (click)</button>
 
     <div id="myVideoStreamHidden" class="myVideoStream" style="display:none;">
-        <video id="myvideo" autoplay muted></video>
+        <video id="myvideo" autoplay></video>
     </div>
 
     <div id="theirVideoStreamHidden" class="theirVideoStream" style="display:none;">
-        <video id="theirvideo" autoplay mute></video>
+        <video id="theirvideo" autoplay></video>
     </div>
 
 </body>

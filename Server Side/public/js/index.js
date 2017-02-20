@@ -1,3 +1,5 @@
+$(document).ready(function() {
+
     // Compatibility shim
     navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
@@ -58,9 +60,9 @@
         }, function(err) { console.log(err.name + ": " + err.message); });
     };
 
-    //Stops users own stream. NEED TO ADD TO STOP ALL PEOPLE STREAMING TO IT.
+    //Stops users own stream. 
     function stopOwnStream(inCalls) {
-        console.log(inCalls);
+
         //Hide the div where the video is.
         document.getElementById('myVideoStreamHidden').style.display = "none";
 
@@ -71,12 +73,11 @@
         for (var i = 0; i < inCalls.length; i++) {
 
             inCalls[i].close();
-            console.log(inCalls[i]);
 
         };
 
         //Resets the list to save all incoming calls that a peer receives.
-        var inCalls = [];
+        inCalls.length = 0;
 
     };
 
@@ -112,30 +113,26 @@
             //Adds a new outgoing call to the outgoing calls list.
             outCalls.push(call);
 
-            var outCallsLength = outCalls.length;
-
         }, function(err) { console.log(err.name + ": " + err.message); });
 
     };
 
 
     //It stops the stream that we are watching.
-    function stopTheirStream(outCallsLength) {
-        console.log(outCallsLength);
+    function stopTheirStream(outCalls) {
+
         //Hide the div where the video is.
         document.getElementById('theirVideoStreamHidden').style.display = "none";
 
         //Closes all the incoming calls.
-        for (var i = 0; i < outCallsLength; i++) {
+        for (var i = 0; i < outCalls.length; i++) {
 
             outCalls[i].close();
-            console.log(outCalls[i]);
 
         };
 
         //Resets the list to save all outgoing calls that a peer does.
         var outCalls = [];
-        console.log(outCalls);
 
     };
 
@@ -149,7 +146,7 @@
     //Terminate stream.
     $('#stopownstream').click(function() {
 
-        stopOwnStream();
+        stopOwnStream(inCalls);
 
     });
 
@@ -163,7 +160,7 @@
     //Terminate stream we are watching.
     $('#stoptheirstream').click(function() {
 
-        stopTheirStream();
+        stopTheirStream(outCalls);
 
     });
 
@@ -431,3 +428,5 @@
         }, 500);
     };*/
     /*End of the video peerCDN part of the project.*/
+
+});

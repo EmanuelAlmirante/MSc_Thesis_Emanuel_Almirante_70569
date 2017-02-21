@@ -11,4 +11,4 @@ Next tasks to be done:
 
 * Do the P2P part, so that the video is download from the server only by one client and the other clients download it through P2P.
 
-* Make the peers able to colaborate with content and that content is shown to the other peers. Changed the focus to live-video. Not sure if it is the best, but it is the easiest.
+* Peers can stream video to each other. Need to make the list of streams available.

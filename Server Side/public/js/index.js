@@ -56,8 +56,12 @@ $(document).ready(function() {
             window.localStream = stream;
             document.getElementById('myVideoStreamHidden').style.display = "block";
 
+            streamHash = btoa(localStream);
+            streamHash = JSON.stringify(streamHash);
+            peer.announceStream(streamHash);
 
         }, function(err) { console.log(err.name + ": " + err.message); });
+
     };
 
     //Stops users own stream. 
@@ -77,7 +81,7 @@ $(document).ready(function() {
         };
 
         //Resets the list to save all incoming calls that a peer receives.
-        inCalls.length = 0;
+        var inCalls = [];
 
     };
 
@@ -427,6 +431,7 @@ $(document).ready(function() {
             }
         }, 500);
     };*/
+
     /*End of the video peerCDN part of the project.*/
 
 });

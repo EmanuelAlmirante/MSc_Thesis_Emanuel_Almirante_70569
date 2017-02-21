@@ -1184,7 +1184,7 @@
 
         //EMANUEL
         //Get a list with the IDs of peers that are streaming.
-        /*Peer.prototype.announceStream = function(hash, cb) {
+        Peer.prototype.announceStream = function(hash, cb) {
 
             cb = cb || function() {};
             var self = this;
@@ -1227,7 +1227,7 @@
 
             http.send(null);
 
-        };*/
+        };
 
         //TODO ADD send Content
         // JD

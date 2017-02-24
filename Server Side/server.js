@@ -4,11 +4,22 @@ var ExpressPeerServer = require('peer').ExpressPeerServer;
 
 //Not necessary, only for debugging.
 app.use(function(req, res, next) {
+
     if (req.path.indexOf('video') != -1) {
         console.log('Streaming video: ' + req.path);
+
     }
+
     next();
+
 });
+
+/*app.get('/streamer/' + peer.id, function(req, res) {
+
+    res.send('Streamer');
+
+});*/
+
 
 app.use(express.static(__dirname + '/public', { etag: false, lastModified: false }));
 
@@ -22,9 +33,11 @@ var server = app.listen(8000, function() {
 });
 
 var options = {
+
     debug: true,
     allowDiscovery: true,
     allow_discovery: true,
-}
+
+};
 
 app.use('/peerjs', ExpressPeerServer(server, options));

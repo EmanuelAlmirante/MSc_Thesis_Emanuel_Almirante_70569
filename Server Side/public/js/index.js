@@ -15,7 +15,8 @@ $(document).ready(function() {
 
     });
 
-    /*Beginning of the collaboration part of the project.*/
+    /*Beginning of the collaboration part of the project. NEED TO DO THE announceStream() AND SEE IF */
+    /*I CAN NOT ASK FOR THE WEBCAM OF THE PEER THAT WANTS TO CONNECT TO A PEER STREAMING */
 
     // To show the ID of the peer.
     peer.on('open', function() {
@@ -45,6 +46,11 @@ $(document).ready(function() {
 
     });
 
+    /*function storeContent(opts, announce) {
+        window.localStorage[opts.hash] = JSON.stringify(opts);
+        if (announce) peer.announceContent(opts.hash);
+    }*/
+
     //Begins the stream of the user. Basically, gets its video and audio and displays to the user.
     function startStream() {
 
@@ -56,9 +62,9 @@ $(document).ready(function() {
             window.localStream = stream;
             document.getElementById('myVideoStreamHidden').style.display = "block";
 
-            streamHash = btoa(localStream);
-            streamHash = JSON.stringify(streamHash);
-            peer.announceStream(streamHash);
+            /*streamId = btoa(peer.id);
+            streamId = JSON.stringify(streamId);
+            peer.announceStream(streamId);*/
 
         }, function(err) { console.log(err.name + ": " + err.message); });
 

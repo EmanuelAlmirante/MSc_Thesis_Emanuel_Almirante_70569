@@ -1182,7 +1182,7 @@
             }
         };
 
-        //EMANUEL
+        /*//EMANUEL
         //Get a list with the IDs of peers that are streaming.
         Peer.prototype.announceStream = function(hash, cb) {
 
@@ -1197,7 +1197,7 @@
             url += queryString;
 
             // If there's no ID we need to wait for one before trying to init socket.
-            http.open('get', url, true); //WHAT DO I PUT IN METHOD?
+            http.open('get', url, true); //WHAT DO I PUT IN METHOD? EMANUEL
             http.onerror = function(e) {
                 self._abort('server-error', 'Could not get peers from the server.');
                 cb([]);
@@ -1227,7 +1227,7 @@
 
             http.send(null);
 
-        };
+        };*/
 
         //TODO ADD send Content
         // JD

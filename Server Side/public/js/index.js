@@ -1,8 +1,5 @@
 $(document).ready(function() {
 
-    // Compatibility shim
-    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-
     //Gets the ID from the server and creates a PeerJS object.
     var peer = new Peer({
 
@@ -17,6 +14,9 @@ $(document).ready(function() {
 
     /*Beginning of the collaboration part of the project. NEED TO DO THE announceStream() AND SEE IF */
     /*I CAN NOT ASK FOR THE WEBCAM OF THE PEER THAT WANTS TO CONNECT TO A PEER STREAMING */
+
+    // Compatibility shim
+    /*navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
     // To show the ID of the peer.
     peer.on('open', function() {
@@ -44,7 +44,7 @@ $(document).ready(function() {
 
         alert(err.message);
 
-    });
+    });*/
 
     /*function storeContent(opts, announce) {
         window.localStorage[opts.hash] = JSON.stringify(opts);
@@ -52,7 +52,7 @@ $(document).ready(function() {
     }*/
 
     //Begins the stream of the user. Basically, gets its video and audio and displays to the user.
-    function startStream() {
+    /*function startStream() {
 
         var constraints = { audio: true, video: true };
 
@@ -62,16 +62,16 @@ $(document).ready(function() {
             window.localStream = stream;
             document.getElementById('myVideoStreamHidden').style.display = "block";
 
-            /*streamId = btoa(peer.id);
+            streamId = btoa(peer.id);
             streamId = JSON.stringify(streamId);
-            peer.announceStream(streamId);*/
+            peer.announceStream(streamId);
 
         }, function(err) { console.log(err.name + ": " + err.message); });
 
-    };
+    };*/
 
     //Stops users own stream. 
-    function stopOwnStream(inCalls) {
+    /*function stopOwnStream(inCalls) {
 
         //Hide the div where the video is.
         document.getElementById('myVideoStreamHidden').style.display = "none";
@@ -172,32 +172,26 @@ $(document).ready(function() {
 
         stopTheirStream(outCalls);
 
-    });
+    });*/
 
     /*End of the collaboration part of the project. */
 
-
-
-
-
-
     /*Beginning of the video peerCDN part of the project.*/
 
-
-    //var runned = false;
-    //var interval;
+    var runned = false;
+    var interval;
 
 
     //Mudar/apagar.
     //To play the video.
-    /*$('video source').each(function(i, video) {
-        var videoData = $(video).attr('data-src');
+    $('video source').each(function(i, video) {
+        var videoData = $(video).attr('src');
         $(video).attr('src', videoData);
-    });*/
+    });
 
 
     //Transform the name of the video in base 64, to improve delivery of files. 
-    /*function getBase64FromVideoURL(url, done) {
+    function getBase64FromVideoURL(url, done) {
         //var video = document.getElementById("video");
         var video = document.createElement("video");
         //video.setAttribute("src", url);
@@ -393,7 +387,7 @@ $(document).ready(function() {
                 console.log('runnerz');
                 runned = true;
                 window.clearTimeout(interval);
-                var video = document.querySelectorAll("video");
+                var video = document.querySelectorAll("#htmlvideo");
                 var index;
                 //Debug, apagar depois.
                 console.log("video " + video.length);
@@ -402,9 +396,9 @@ $(document).ready(function() {
                         var currentVideo = video[idx];
                         var videoOptions = {};
 
-                        //Debug, apagar depois. Aqui dá erro do datasrc == null. EMANUEL.
-                        console.log(currentVideo.getAttribute('data-src'));
-                        var datasrc = currentVideo.getAttribute('data-src');
+                        //Debug, apagar depois. JÁ NÃO DÁ ERRO. EMANUEL.
+                        console.log(currentVideo.getAttribute('src'));
+                        var datasrc = currentVideo.getAttribute('src');
                         var hashens = datasrc.hashCode();
                         var fullurl = datasrc;
 
@@ -436,7 +430,7 @@ $(document).ready(function() {
                 }
             }
         }, 500);
-    };*/
+    };
 
     /*End of the video peerCDN part of the project.*/
 

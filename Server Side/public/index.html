@@ -16,10 +16,10 @@
     <title>P2P Real-Time Colaboration Prototype</title>
 
     <link rel="stylesheet" href="css/index.css" type="text/css">
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js" defer></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <!-- MUDAR ISTO! EMANUEL. -->
-    <script type="text/javascript" src="/js/peer.js" defer></script>
-    <script type="text/javascript" src="/js/index.js" defer></script>
+    <script type="text/javascript" src="/js/peer.min.js"></script>
+    <script type="text/javascript" src="/js/index.js"></script>
 
 </head>
 
@@ -44,7 +44,7 @@
         </ul>
     </div>
 
-    <video id="video" data-src="/video/30secondtimer.mp4" frameborder="0" allowfullscreen type="video/mp4" controls></video>
+    <video id="htmlvideo" src="/video/30secondtimer.mp4" allowfullscreen type="video/mp4" controls></video>
 
     <button id="startstream">Start your own stream (click)</button>
     <button id="stopownstream">Stop your own stream (click)</button>

@@ -178,35 +178,31 @@ $(document).ready(function() {
 
     /*Beginning of the video peerCDN part of the project.*/
 
+    var connections = {};
     var runned = false;
     var interval;
 
-
-    //Mudar/apagar.
     //To play the video.
     $('video source').each(function(i, video) {
-        var videoData = $(video).attr('src');
+        var videoData = $(video).attr('data-src');
         $(video).attr('src', videoData);
+        console.log(video);
     });
 
 
     //Transform the name of the video in base 64, to improve delivery of files. 
     function getBase64FromVideoURL(url, done) {
-        //var video = document.getElementById("video");
         var video = document.createElement("video");
-        //video.setAttribute("src", url);
-        console.log(video);
-        //var video = document.createElement("video");
-        //video.setAttribute("src", "nameOfFile.ogg");
 
-        video.onload = function() {
+        video.onloadstart = function() {
             console.log('1');
             var canvas = document.createElement("canvas");
             canvas.width = this.width;
             canvas.height = this.height;
             var ctx = canvas.getContext('2d');
-            ctx.drawVideo(this, 0, 0);
+            drawVideo(ctx, video, canvas.width, canvas.height);
             var dataURL = canvas.toDataURL("video/mp4");
+            console.log(dataURL);
             done(dataURL);
         }
 
@@ -214,6 +210,14 @@ $(document).ready(function() {
         console.log(video);
         console.log(url);
     };
+
+    function drawVideo(context, video, width, height) {
+
+        context.drawImage(video, 0, 0, width, height);
+        var delay = 100;
+        setTimeout(drawVideo, delay, context, video, width, height);
+
+    }
 
     //To do the hash of the video.
     String.prototype.hashCode = function() {
@@ -231,8 +235,10 @@ $(document).ready(function() {
 
         //Debug, delete.
         var first = new Date();
+        console.log(first);
         //Debug, delete.
-        video.onload = function() {
+        video.onloadstart = function() {
+            console.log(first);
             var last = new Date();
             console.log(opts.fullurl + ' : server video loading : ' + (last - first) + ' ms');
         };
@@ -387,7 +393,7 @@ $(document).ready(function() {
                 console.log('runnerz');
                 runned = true;
                 window.clearTimeout(interval);
-                var video = document.querySelectorAll("#htmlvideo");
+                var video = document.querySelectorAll("#mainvideo");
                 var index;
                 //Debug, apagar depois.
                 console.log("video " + video.length);
@@ -396,9 +402,9 @@ $(document).ready(function() {
                         var currentVideo = video[idx];
                         var videoOptions = {};
 
-                        //Debug, apagar depois. JÁ NÃO DÁ ERRO. EMANUEL.
-                        console.log(currentVideo.getAttribute('src'));
-                        var datasrc = currentVideo.getAttribute('src');
+                        //Debug, apagar depois. 
+                        console.log(currentVideo.getAttribute('data-src'));
+                        var datasrc = currentVideo.getAttribute('data-src');
                         var hashens = datasrc.hashCode();
                         var fullurl = datasrc;
 

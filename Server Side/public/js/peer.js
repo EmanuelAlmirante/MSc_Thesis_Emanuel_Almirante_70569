@@ -1273,6 +1273,7 @@
         };
 
         //TODO ADD request content
+
         // JD
         /* Get a list of peers that have a certain content */
         Peer.prototype.listAllPeersWithContent = function(hash, cb) {

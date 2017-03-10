@@ -1182,7 +1182,7 @@
             }
         };
 
-        /*//EMANUEL
+        //EMANUEL
         //Get a list with the IDs of peers that are streaming.
         Peer.prototype.announceStream = function(hash, cb) {
 
@@ -1191,13 +1191,13 @@
             var http = new XMLHttpRequest();
             var protocol = this.options.secure ? 'https://' : 'http://';
             var url = protocol + this.options.host + ':' + this.options.port +
-                this.options.path + this.options.key + '/streamer/' + this.id;
+                this.options.path + this.options.key + '/streamer/' + hash;
             console.log(url); //EMANUEL
             var queryString = '?ts=' + new Date().getTime() + '' + Math.random();
             url += queryString;
 
             // If there's no ID we need to wait for one before trying to init socket.
-            http.open('get', url, true); //WHAT DO I PUT IN METHOD? EMANUEL
+            http.open('get', url, true);
             http.onerror = function(e) {
                 self._abort('server-error', 'Could not get peers from the server.');
                 cb([]);
@@ -1227,7 +1227,7 @@
 
             http.send(null);
 
-        };*/
+        };
 
         //TODO ADD send Content
         // JD

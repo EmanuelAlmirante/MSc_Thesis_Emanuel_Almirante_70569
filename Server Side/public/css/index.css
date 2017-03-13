@@ -5,6 +5,14 @@
     height: 50px;
 }
 
+.list {
+    position: absolute;
+    top: 130px;
+    left: 1050px;
+    width: 500px;
+    height: 50px;
+}
+
 #mainvideo {
     position: absolute;
     top: 10px;

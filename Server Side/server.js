@@ -3,8 +3,10 @@ var app = express();
 var ExpressPeerServer = require('peer').ExpressPeerServer;
 
 app.use(function(req, res, next) {
+
     if (req.path.indexOf('video') != -1) console.log('Streaming video: ' + req.path);
     next();
+
 });
 
 app.use(express.static(__dirname + '/public', { etag: false, lastModified: false }));
@@ -15,12 +17,15 @@ var server = app.listen(8000, function() {
     var port = server.address().port;
 
     console.log('Listening at http://%s:%s', host, port);
+
 });
 
 var options = {
+
     debug: true,
     allowDiscovery: true,
     allow_discovery: true,
+
 };
 
 app.use('/peerjs', ExpressPeerServer(server, options));

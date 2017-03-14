@@ -1,15 +1,15 @@
 .stats {
     position: absolute;
     left: 1050px;
-    width: 500px;
+    width: 250px;
     height: 50px;
 }
 
 .list {
     position: absolute;
-    top: 130px;
-    left: 1050px;
-    width: 500px;
+    top: 25px;
+    left: 1300px;
+    width: 1000px;
     height: 50px;
 }
 

@@ -1192,7 +1192,6 @@
             var protocol = this.options.secure ? 'https://' : 'http://';
             var url = protocol + this.options.host + ':' + this.options.port +
                 this.options.path + this.options.key + '/streamer/' + hash;
-            console.log(url); //EMANUEL
             var queryString = '?ts=' + new Date().getTime() + '' + Math.random();
             url += queryString;
 

@@ -73,6 +73,10 @@
         //Stops users own stream. 
         function stopOwnStream(inCalls) {
 
+            hash = btoa('streamer');
+
+            peer.deleteStreamer(hash);
+
             //Hide the div where the video is.
             document.getElementById('myVideoStreamHidden').style.display = "none";
 
@@ -81,7 +85,9 @@
 
             //Closes all the incoming calls.
             for (var i = 0; i < inCalls.length; i++) {
+
                 inCalls[i].close();
+
             };
 
             //Resets the list to save all incoming calls that a peer receives.
@@ -150,10 +156,6 @@
         $('#stopownstream').click(function() {
 
             stopOwnStream(inCalls);
-
-            hash = btoa('streamer');
-
-            peer.deleteStreamer(hash);
 
         });
 

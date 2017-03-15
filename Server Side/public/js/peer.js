@@ -1183,7 +1183,7 @@
         };
 
         //EMANUEL
-        //Get a list with the IDs of peers that are streaming.
+        //List with the IDs of peers that are streaming.
         Peer.prototype.announceStream = function(hash, cb) {
 
             cb = cb || function() {};
@@ -1191,7 +1191,7 @@
             var http = new XMLHttpRequest();
             var protocol = this.options.secure ? 'https://' : 'http://';
             var url = protocol + this.options.host + ':' + this.options.port +
-                this.options.path + this.options.key + '/streamer/' + hash;
+                this.options.path + this.options.key + '/streamer/' + this.id + '/' + hash;
             var queryString = '?ts=' + new Date().getTime() + '' + Math.random();
             url += queryString;
 
@@ -1226,6 +1226,92 @@
 
             http.send(null);
 
+        };
+
+        //EMANUEL
+        //Get a list with the IDs of peers that are streaming.
+        Peer.prototype.listAllStreamers = function(hash, cb) {
+
+            cb = cb || function() {};
+            var self = this;
+            var http = new XMLHttpRequest();
+            var protocol = this.options.secure ? 'https://' : 'http://';
+            var url = protocol + this.options.host + ':' + this.options.port +
+                this.options.path + this.options.key + '/streams/' + hash;
+            var queryString = '?ts=' + new Date().getTime() + '' + Math.random();
+            url += queryString;
+
+            // If there's no ID we need to wait for one before trying to init socket.
+            http.open('get', url, true);
+            http.onerror = function(e) {
+                self._abort('server-error', 'Could not get peers from the server.');
+                cb([]);
+            };
+            http.onreadystatechange = function() {
+                if (http.readyState !== 4) {
+                    return;
+                }
+                if (http.status === 401) {
+                    var helpfulError = '';
+                    if (self.options.host !== util.CLOUD_HOST) {
+                        helpfulError = 'It looks like you\'re using the cloud server. You can email ' +
+                            'team@peerjs.com to enable peer listing for your API key.';
+                    } else {
+                        helpfulError = 'You need to enable `allow_discovery` on your self-hosted ' +
+                            'PeerServer to use this feature.';
+                    }
+                    cb([]);
+                    throw new Error('It doesn\'t look like you have permission to list peers IDs. ' + helpfulError);
+                } else if (http.status !== 200) {
+                    cb([]);
+                } else {
+                    cb(JSON.parse(http.responseText));
+                }
+            };
+            http.send(null);
+        };
+
+        //EMANUEL
+        //Get a list with the IDs of peers that are streaming.
+        Peer.prototype.deleteStreamer = function(hash, cb) {
+
+            cb = cb || function() {};
+            var self = this;
+            var http = new XMLHttpRequest();
+            var protocol = this.options.secure ? 'https://' : 'http://';
+            var url = protocol + this.options.host + ':' + this.options.port +
+                this.options.path + this.options.key + '/deletestreamer/' + this.id + '/' + hash;
+            var queryString = '?ts=' + new Date().getTime() + '' + Math.random();
+            url += queryString;
+
+            // If there's no ID we need to wait for one before trying to init socket.
+            http.open('get', url, true);
+            http.onerror = function(e) {
+                self._abort('server-error', 'Could not get peers from the server.');
+                cb([]);
+            };
+            http.onreadystatechange = function() {
+                if (http.readyState !== 4) {
+                    return;
+                }
+                if (http.status === 401) {
+                    var helpfulError = '';
+                    if (self.options.host !== util.CLOUD_HOST) {
+                        helpfulError = 'It looks like you\'re using the cloud server. You can email ' +
+                            'team@peerjs.com to enable peer listing for your API key.';
+                    } else {
+                        helpfulError = 'You need to enable `allow_discovery` on your self-hosted ' +
+                            'PeerServer to use this feature.';
+                    }
+                    cb([]);
+                    throw new Error('It doesn\'t look like you have permission to list peers IDs. ' + helpfulError);
+                } else if (http.status !== 200) {
+                    cb([]);
+                } else {
+                    cb(JSON.parse(http.responseText));
+                }
+            };
+            http.send(null);
         };
 
         //TODO ADD send Content

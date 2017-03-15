@@ -1183,7 +1183,7 @@
         };
 
         //EMANUEL
-        //List with the IDs of peers that are streaming.
+        //Peer announces that is a streamer and is added to the streamers list.
         Peer.prototype.announceStream = function(hash, cb) {
 
             cb = cb || function() {};
@@ -1272,7 +1272,7 @@
         };
 
         //EMANUEL
-        //Get a list with the IDs of peers that are streaming.
+        //Delete the peer with the peer from the list of streamers.
         Peer.prototype.deleteStreamer = function(hash, cb) {
 
             cb = cb || function() {};

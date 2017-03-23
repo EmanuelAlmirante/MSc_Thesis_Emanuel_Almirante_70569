@@ -341,12 +341,13 @@
             this.peer = peer;
             this.provider = provider;
             this.metadata = this.options.metadata;
-            this.localStream = this.options._stream;
+            this.localStreams = this.options._streams;
+            this.remoteStreams = [];
 
             this.id = this.options.connectionId || MediaConnection._idPrefix + util.randomToken();
-            if (this.localStream) {
+            if (this.localStreams) {
                 Negotiator.startConnection(
-                    this, { _stream: this.localStream, originator: true }
+                    this, { _streams: this.localStreams, originator: true }
                 );
             }
         };
@@ -358,7 +359,7 @@
         MediaConnection.prototype.addStream = function(remoteStream) {
             util.log('Receiving stream', remoteStream);
 
-            this.remoteStream = remoteStream;
+            this.remoteStreams.push(remoteStream);
             this.emit('stream', remoteStream); // Should we call this `open`?
 
         };
@@ -381,15 +382,20 @@
             }
         }
 
-        MediaConnection.prototype.answer = function(stream) {
-            if (this.localStream) {
-                util.warn('Local stream already exists on this MediaConnection. Are you answering a call twice?');
+        MediaConnection.prototype.answer = function(streams) {
+            // Streams can either be one stream or an array of streams.
+            if (toString.call(streams) !== '[object Array]') {
+                streams = [streams];
+            }
+
+            if (this.localStreams) {
+                util.warn('Local stream(s) already exists on this MediaConnection. Are you answering a call twice?');
                 return;
             }
 
-            this.options._payload._stream = stream;
+            this.options._payload._streams = streams;
 
-            this.localStream = stream;
+            this.localStreams = streams;
             Negotiator.startConnection(
                     this,
                     this.options._payload
@@ -443,13 +449,18 @@
         Negotiator.startConnection = function(connection, options) {
             var pc = Negotiator._getPeerConnection(connection, options);
 
-            if (connection.type === 'media' && options._stream) {
-                // Add the stream.
-                pc.addStream(options._stream);
-            }
-
             // Set the connection's PC.
             connection.pc = connection.peerConnection = pc;
+
+            if (connection.type === 'media' && options._streams) {
+                // Add the stream.
+                for (var i = 0, ii = options._streams.length; i < ii; i += 1) {
+                    var stream = options._streams[i];
+                    console.log('Adding a stream', stream.label);
+                    pc.addStream(stream);
+                }
+            }
+
             // What do we need to do now?
             if (options.originator) {
                 if (connection.type === 'data') {
@@ -1036,20 +1047,24 @@
          * Returns a MediaConnection to the specified peer. See documentation for a
          * complete list of options.
          */
-        Peer.prototype.call = function(peer, stream, options) {
+        Peer.prototype.call = function(peer, streams, options) {
             if (this.disconnected) {
                 util.warn('You cannot connect to a new Peer because you called ' +
-                    '.disconnect() on this Peer and ended your connection with the ' +
-                    'server. You can create a new Peer to reconnect.');
+                    '.disconnect() on this Peer and ended your connection with the' +
+                    ' server. You can create a new Peer to reconnect.');
                 this.emitError('disconnected', 'Cannot connect to new Peer after disconnecting from server.');
                 return;
             }
-            if (!stream) {
-                util.error('To call a peer, you must provide a stream from your browser\'s `getUserMedia`.');
+            if (!streams) {
+                util.error('To call a peer, you must provide a stream or an array of streams from your browser\'s `getUserMedia`.');
                 return;
             }
+            // Streams can either be one stream or an array of streams.
+            if (toString.call(streams) !== '[object Array]') {
+                streams = [streams];
+            }
             options = options || {};
-            options._stream = stream;
+            options._streams = streams;
             var call = new MediaConnection(peer, this, options);
             this._addConnection(peer, call);
             return call;
@@ -1281,6 +1296,138 @@
             var protocol = this.options.secure ? 'https://' : 'http://';
             var url = protocol + this.options.host + ':' + this.options.port +
                 this.options.path + this.options.key + '/deletestreamer/' + this.id + '/' + hash;
+            var queryString = '?ts=' + new Date().getTime() + '' + Math.random();
+            url += queryString;
+
+            // If there's no ID we need to wait for one before trying to init socket.
+            http.open('get', url, true);
+            http.onerror = function(e) {
+                self._abort('server-error', 'Could not get peers from the server.');
+                cb([]);
+            };
+            http.onreadystatechange = function() {
+                if (http.readyState !== 4) {
+                    return;
+                }
+                if (http.status === 401) {
+                    var helpfulError = '';
+                    if (self.options.host !== util.CLOUD_HOST) {
+                        helpfulError = 'It looks like you\'re using the cloud server. You can email ' +
+                            'team@peerjs.com to enable peer listing for your API key.';
+                    } else {
+                        helpfulError = 'You need to enable `allow_discovery` on your self-hosted ' +
+                            'PeerServer to use this feature.';
+                    }
+                    cb([]);
+                    throw new Error('It doesn\'t look like you have permission to list peers IDs. ' + helpfulError);
+                } else if (http.status !== 200) {
+                    cb([]);
+                } else {
+                    cb(JSON.parse(http.responseText));
+                }
+            };
+            http.send(null);
+        };
+
+        //EMANUEL
+        //Peer announces that is a secondary streamer and is added to the secondary streamers list.
+        Peer.prototype.announceSecondaryStream = function(hash, cb) {
+
+            cb = cb || function() {};
+            var self = this;
+            var http = new XMLHttpRequest();
+            var protocol = this.options.secure ? 'https://' : 'http://';
+            var url = protocol + this.options.host + ':' + this.options.port +
+                this.options.path + this.options.key + '/secondarystreamer/' + this.id + '/' + hash;
+            var queryString = '?ts=' + new Date().getTime() + '' + Math.random();
+            url += queryString;
+
+            // If there's no ID we need to wait for one before trying to init socket.
+            http.open('get', url, true);
+            http.onerror = function(e) {
+                self._abort('server-error', 'Could not get peers from the server.');
+                cb([]);
+            };
+
+            http.onreadystatechange = function() {
+                if (http.readyState !== 4) {
+                    return;
+                }
+                if (http.status === 401) {
+                    var helpfulError = '';
+                    if (self.options.host !== util.CLOUD_HOST) {
+                        helpfulError = 'It looks like you\'re using the cloud server. You can email ' +
+                            'team@peerjs.com to enable peer listing for your API key.';
+                    } else {
+                        helpfulError = 'You need to enable `allow_discovery` on your self-hosted ' +
+                            'PeerServer to use this feature.';
+                    }
+                    cb([]);
+                    throw new Error('It doesn\'t look like you have permission to list peers IDs. ' + helpfulError);
+                } else if (http.status !== 200) {
+                    cb([]);
+                } else {
+                    cb(JSON.parse(http.responseText));
+                }
+            };
+
+            http.send(null);
+
+        };
+
+        //EMANUEL
+        //Get a list with the IDs of peers that are secondary streamers.
+        Peer.prototype.listAllSecondaryStreamers = function(hash, cb) {
+
+            cb = cb || function() {};
+            var self = this;
+            var http = new XMLHttpRequest();
+            var protocol = this.options.secure ? 'https://' : 'http://';
+            var url = protocol + this.options.host + ':' + this.options.port +
+                this.options.path + this.options.key + '/secondarystreams/' + hash;
+            var queryString = '?ts=' + new Date().getTime() + '' + Math.random();
+            url += queryString;
+
+            // If there's no ID we need to wait for one before trying to init socket.
+            http.open('get', url, true);
+            http.onerror = function(e) {
+                self._abort('server-error', 'Could not get peers from the server.');
+                cb([]);
+            };
+            http.onreadystatechange = function() {
+                if (http.readyState !== 4) {
+                    return;
+                }
+                if (http.status === 401) {
+                    var helpfulError = '';
+                    if (self.options.host !== util.CLOUD_HOST) {
+                        helpfulError = 'It looks like you\'re using the cloud server. You can email ' +
+                            'team@peerjs.com to enable peer listing for your API key.';
+                    } else {
+                        helpfulError = 'You need to enable `allow_discovery` on your self-hosted ' +
+                            'PeerServer to use this feature.';
+                    }
+                    cb([]);
+                    throw new Error('It doesn\'t look like you have permission to list peers IDs. ' + helpfulError);
+                } else if (http.status !== 200) {
+                    cb([]);
+                } else {
+                    cb(JSON.parse(http.responseText));
+                }
+            };
+            http.send(null);
+        };
+
+        //EMANUEL
+        //Delete the peer with the peer from the list of secondary streamers.
+        Peer.prototype.deleteSecondaryStreamer = function(hash, cb) {
+
+            cb = cb || function() {};
+            var self = this;
+            var http = new XMLHttpRequest();
+            var protocol = this.options.secure ? 'https://' : 'http://';
+            var url = protocol + this.options.host + ':' + this.options.port +
+                this.options.path + this.options.key + '/deletesecondarystreamer/' + this.id + '/' + hash;
             var queryString = '?ts=' + new Date().getTime() + '' + Math.random();
             url += queryString;
 

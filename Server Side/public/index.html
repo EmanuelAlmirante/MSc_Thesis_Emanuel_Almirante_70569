@@ -12,7 +12,8 @@
 
     <link rel="stylesheet" href="css/index.css" type="text/css">
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <script type="text/javascript" src="/js/peer.min.js"></script>
+    <!-- ALTERAR ISTO!-->
+    <script type="text/javascript" src="/js/peer.js"></script>
     <script type="text/javascript" src="/js/index.js"></script>
 
 </head>
@@ -35,25 +36,25 @@
     </div>
 
     <div class="list">
-        <button id="streamslist">Streams available (click)</button>
+        <button id="streamslist">Streams available</button>
         <ul id="streamlist">
         </ul>
     </div>
 
-    <video id="mainvideo" data-src="/vid/30.mp4" allowfullscreen type="video/mp4" controls></video>
+    <video id="mainvideo" data-src="/vid/30.mp4" allowfullscreen type="video/mp4" controls autoplay></video>
 
-    <button id="startstream">Start your own stream (click)</button>
-    <button id="stopownstream">Stop your own stream (click)</button>
+    <button id="startstream">Start audio and video stream</button>
+    <button id="stopownstream">Stop audio and video stream</button>
     <input id="calltoid" type="text" placeholder="ID of the stream" />
     <input id="submitcalltoid" type="submit" value="Connect">
-    <button id="stoptheirstream">Stop their stream (click)</button>
+    <button id="stoptheirstream">Stop their stream</button>
 
     <div id="myVideoStreamHidden" class="myVideoStream" style="display:none;">
-        <video id="myvideo" autoplay></video>
+        <video id="myvideo" controls autoplay></video>
     </div>
 
     <div id="theirVideoStreamHidden" class="theirVideoStream" style="display:none;">
-        <video id="theirvideo" autoplay></video>
+        <video id="theirvideo" controls autoplay></video>
     </div>
 
 </body>

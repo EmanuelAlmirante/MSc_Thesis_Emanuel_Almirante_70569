@@ -18,7 +18,13 @@
 
     $(document).ready(function() {
 
-        /*Beginning of the collaboration part of the project. NEED TO DO THE announceStream() */
+        /*Beginning of the collaboration part of the project. */
+
+        //List to save all incoming calls and outgoing calls.
+        var inCalls = [];
+        var outCalls = [];
+
+        var secondaryHash;
 
         // To show the ID of the peer.
         peer.on('open', function() {
@@ -30,17 +36,44 @@
         // Compatibility shim
         navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
-        //List to save all incoming calls that a peer receives.
-        var inCalls = [];
-        var outCalls = [];
-
         //When the peer receives a request to connect to it's stream.
         peer.on('call', function(call) {
 
-            //Answer the call automatically (instead of prompting user) for demo purposes.
-            call.answer(window.localStream);
-            //Adds a new incoming call to the incoming calls list.
-            inCalls.push(call);
+            if (typeof remoteStream == 'undefined' && typeof localStream != 'undefined') {
+
+                //Answer the call automatically instead of prompting user.
+                call.answer(window.localStream);
+                //Adds a new incoming call to the incoming calls list.
+                inCalls.push(call);
+
+            } else if (typeof remoteStream != 'undefined' && typeof localStream == 'undefined') {
+
+                //Answer the call automatically instead of prompting user.
+                call.answer(window.remoteStream);
+                //Adds a new incoming call to the incoming calls list.
+                inCalls.push(call);
+
+            } else if (typeof remoteStream != 'undefined' && typeof localStream != 'undefined') {
+
+                console.log('Caso 3');
+
+                var mixStream = remoteStream;
+                console.log(mixStream);
+
+                var videoMixStream = mixStream.getVideoTracks();
+                console.log(videoMixStream);
+
+                var audioMixStream = localStream.getAudioTracks();
+                console.log(audioMixStream);
+
+                var finalMixStream = videoMixStream.addStream(audioMixStream);
+
+                //Answer the call automatically instead of prompting user.
+                call.answer(window.finalMixStream);
+                //Adds a new incoming call to the incoming calls list.
+                inCalls.push(call);
+
+            };
 
         });
 
@@ -62,9 +95,11 @@
                 window.localStream = stream;
                 document.getElementById('myVideoStreamHidden').style.display = "block";
 
-                hash = btoa('streamer');
+                mainHash = btoa('mainstreamer');
+                secondaryHash = btoa(peer.id);
 
-                peer.announceStream(hash);
+                peer.announceStream(mainHash);
+                peer.announceSecondaryStream(secondaryHash);
 
             }, function(err) { console.log(err.name + ": " + err.message); });
 
@@ -73,9 +108,11 @@
         //Stops users own stream. 
         function stopOwnStream(inCalls) {
 
-            hash = btoa('streamer');
+            mainHash = btoa('mainstreamer');
+            secondaryHash = btoa(peer.id);
 
-            peer.deleteStreamer(hash);
+            peer.deleteStreamer(mainHash);
+            peer.deleteSecondaryStreamer(secondaryHash);
 
             //Hide the div where the video is.
             document.getElementById('myVideoStreamHidden').style.display = "none";
@@ -95,26 +132,46 @@
 
         };
 
-        //It connects and shows the stream we want. Is it possible to not ask for permissions?
+        //It connects and shows the stream we want.
         function showTheirStream() {
 
-            //List to save all outgoing calls that a peer does.
-            var outCalls = [];
-            var constraints = { audio: false, video: true };
+            if (secondaryHash != btoa(document.getElementById('calltoid').value) && typeof secondaryHash != 'undefined') {
+
+                peer.deleteSecondaryStreamer(secondaryHash);
+
+            }
+
+            secondaryHash = btoa(document.getElementById('calltoid').value);
+
+            var constraints = { audio: true, video: true };
+            var randomPeer = [];
+
+            peer.listAllSecondaryStreamers(secondaryHash, function(list) {
+
+                randomPeer = list[Math.floor(Math.random() * list.length)];
+
+                while (randomPeer == peer.id) {
+
+                    randomPeer = list[Math.floor(Math.random() * list.length)];
+
+                };
+
+            });
 
             navigator.getUserMedia(constraints, function(NULL) {
 
                 $('#mytheirvideo').prop('src', URL.createObjectURL(NULL));
                 window.localStreamVideo = NULL;
 
-                var call = peer.call(document.getElementById('calltoid').value, NULL);
+                var call = peer.call(randomPeer, NULL);
 
                 document.getElementById('theirVideoStreamHidden').style.display = "block";
+                document.getElementById('mainvideo').style.display = "none";
 
                 call.on('stream', function(stream) {
 
                     $('#theirvideo').prop('src', URL.createObjectURL(stream));
-                    window.remoteTheirStream = stream;
+                    window.remoteStream = stream;
 
                 });
 
@@ -123,13 +180,19 @@
                 //Adds a new outgoing call to the outgoing calls list.
                 outCalls.push(call);
 
+                peer.announceSecondaryStream(secondaryHash);
+
             }, function(err) { console.log(err.name + ": " + err.message); });
 
         };
 
         //It stops the stream that we are watching. 
-        function stopTheirStream(outCalls) {
+        function stopTheirStream(outCalls, inCalls) {
 
+            secondaryHash = btoa(document.getElementById('calltoid').value);
+            peer.deleteSecondaryStreamer(secondaryHash);
+
+            document.getElementById('mainvideo').style.display = "block";
             //Hide the div where the video is.
             document.getElementById('theirVideoStreamHidden').style.display = "none";
 
@@ -140,8 +203,17 @@
 
             };
 
+            //Closes all the incoming calls.
+            for (var i = 0; i < inCalls.length; i++) {
+
+                inCalls[i].close();
+
+            };
+
             //Resets the list to save all outgoing calls that a peer does.
             var outCalls = [];
+            //Resets the list to save all incoming calls that a peer receives.
+            var inCalls = [];
 
         };
 
@@ -149,6 +221,13 @@
         $('#startstream').click(function() {
 
             startStream();
+
+        });
+
+        //Initiate stream.
+        $('#startaudio').click(function() {
+
+            startAudio();
 
         });
 
@@ -162,14 +241,14 @@
         //Connects to a third party stream.
         $('#submitcalltoid').click(function() {
 
-            showTheirStream(peer.id);
+            showTheirStream();
 
         });
 
-        //Terminate stream we are watching.
+        //Terminate the stream we are watching.
         $('#stoptheirstream').click(function() {
 
-            stopTheirStream(outCalls);
+            stopTheirStream(outCalls, inCalls);
 
         });
 
@@ -177,7 +256,7 @@
         $('#streamslist').click(function() {
 
             $("#streamlist").empty();
-            hash = btoa('streamer');
+            hash = btoa('mainstreamer');
             var streamList = "";
 
             peer.listAllStreamers(hash, function(list) {

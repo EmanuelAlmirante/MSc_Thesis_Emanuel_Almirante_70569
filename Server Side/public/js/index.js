@@ -33,9 +33,6 @@
 
         });
 
-        // Compatibility shim
-        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-
         //When the peer receives a request to connect to it's stream.
         peer.on('call', function(call) {
 
@@ -55,21 +52,20 @@
 
             } else if (typeof remoteStream != 'undefined' && typeof localStream != 'undefined') {
 
-                console.log('Caso 3');
+                /**This is not working and I can't make it work, but this is the solution for what I want.*/
+                /*var newStream = new MediaStream(remoteStream);
 
-                var mixStream = remoteStream;
-                console.log(mixStream);
+                var newStreamAudio = newStream.getAudioTracks();
 
-                var videoMixStream = mixStream.getVideoTracks();
-                console.log(videoMixStream);
+                var newStreamVideo = newStream.removeTrack(newStreamAudio);
 
-                var audioMixStream = localStream.getAudioTracks();
-                console.log(audioMixStream);
+                var oldStream = new MediaStream(localStream);
+                var oldStreamAudio = oldStream.getAudioTracks();
 
-                var finalMixStream = videoMixStream.addStream(audioMixStream);
+                newStream = newStream.addTrack(oldStreamAudio);*/
 
                 //Answer the call automatically instead of prompting user.
-                call.answer(window.finalMixStream);
+                call.answer(window.localStream); //newStream
                 //Adds a new incoming call to the incoming calls list.
                 inCalls.push(call);
 
@@ -89,7 +85,9 @@
 
             var constraints = { audio: true, video: true };
 
-            navigator.getUserMedia(constraints, function(stream) {
+            peer.deleteSecondaryStreamer(secondaryHash);
+
+            navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
 
                 $('#myvideo').prop('src', URL.createObjectURL(stream));
                 window.localStream = stream;
@@ -101,7 +99,7 @@
                 peer.announceStream(mainHash);
                 peer.announceSecondaryStream(secondaryHash);
 
-            }, function(err) { console.log(err.name + ": " + err.message); });
+            }).catch(function(err) { console.log(err.name + ": " + err.message); });
 
         };
 
@@ -129,6 +127,13 @@
 
             //Resets the list to save all incoming calls that a peer receives.
             var inCalls = [];
+
+            if (typeof secondaryHash != 'undefined' && btoa(document.getElementById('calltoid').value) != '') {
+
+                secondaryHash = btoa(document.getElementById('calltoid').value);
+                peer.announceSecondaryStream(secondaryHash);
+
+            };
 
         };
 
@@ -158,7 +163,7 @@
 
             });
 
-            navigator.getUserMedia(constraints, function(NULL) {
+            navigator.mediaDevices.getUserMedia(constraints).then(function(NULL) {
 
                 $('#mytheirvideo').prop('src', URL.createObjectURL(NULL));
                 window.localStreamVideo = NULL;
@@ -182,7 +187,7 @@
 
                 peer.announceSecondaryStream(secondaryHash);
 
-            }, function(err) { console.log(err.name + ": " + err.message); });
+            }).catch(function(err) { console.log(err.name + ": " + err.message); });
 
         };
 

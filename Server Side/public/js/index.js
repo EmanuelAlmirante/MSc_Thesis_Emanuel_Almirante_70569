@@ -109,6 +109,8 @@
                 window.localStream = stream;
                 //Blocks the style of the div.
                 document.getElementById('myVideoStreamHidden').style.display = "block";
+                //Mutes the video with the HTML tag 'mainvideo'.
+                document.getElementById('mainvideo').muted = true;
 
                 //Hashes to easily access the lists.
                 mainHash = btoa('mainstreamer');
@@ -137,6 +139,8 @@
 
             //Hide the div where the video is.
             document.getElementById('myVideoStreamHidden').style.display = "none";
+            //Unmutes the video with the HMTL tag 'mainvideo'.
+            document.getElementById('mainvideo').muted = false;
 
             //Stops the video and audio tracks.
             localStream.stop();
@@ -166,8 +170,8 @@
         //It connects and shows the stream we want.
         function showTheirStream() {
 
-            //If a peer was watching a different remote stream is deleted from the secondary streamers of the former remote stream.
-            if (secondaryHash != btoa(document.getElementById('calltoid').value) && typeof secondaryHash != 'undefined') {
+            //If a peer was watching a different remote stream or is not streaming it is deleted from the secondary streamers of the former remote stream.
+            if (secondaryHash != btoa(document.getElementById('calltoid').value) && typeof secondaryHash != 'undefined' && secondaryHash != btoa(peer.id)) {
 
                 //Deletes this peer as a secondary streamer, for peers to stop connecting to him.
                 peer.deleteSecondaryStreamer(secondaryHash);
@@ -205,6 +209,8 @@
                 document.getElementById('theirVideoStreamHidden').style.display = "block";
                 //Hide the div where the video is.
                 document.getElementById('mainvideo').style.display = "none";
+                //Mutes the video with the HMTL tag 'mainvideo'.
+                document.getElementById('mainvideo').muted = true;
 
                 //Makes the call to the random peer.
                 call.on('stream', function(stream) {
@@ -223,8 +229,13 @@
                 //Adds a new outgoing call to the outgoing calls list.
                 outCalls.push(call);
 
-                //Announces this peer as a secondary streamer, for peers to connect to him.
-                peer.announceSecondaryStream(secondaryHash);
+                //If a peer is not streaming.
+                if (typeof localStream == 'undefined') {
+
+                    //Announces this peer as a secondary streamer, for peers to connect to him.
+                    peer.announceSecondaryStream(secondaryHash);
+
+                };
 
             }).catch(function(err) { console.log(err.name + ": " + err.message); });
 
@@ -239,6 +250,8 @@
 
             //Blocks the style of the div.
             document.getElementById('mainvideo').style.display = "block";
+            //Unmutes the video with the HMTL tag 'mainvideo'.
+            document.getElementById('mainvideo').muted = false;
             //Hide the div where the video is.
             document.getElementById('theirVideoStreamHidden').style.display = "none";
 
@@ -250,7 +263,7 @@
             };
 
             //Closes all the incoming calls.
-            for (var i = 0; i < inCalls.length; i++) {
+            for (var i = 0; i < inCallsRemote.length; i++) {
 
                 inCallsRemote[i].close();
 

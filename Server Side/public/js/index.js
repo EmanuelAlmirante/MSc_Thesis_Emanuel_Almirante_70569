@@ -1,10 +1,11 @@
     //Gets the ID from the server and creates a PeerJS object.
     var connections = {};
 
+    //Creates a new peer.
     var peer = new Peer({
 
-        // host: '52.18.51.141', online server
-        // port: 80, online server
+        // host: '52.18.51.141', online server.
+        // port: 80, online server.
         host: 'localhost',
         port: 8000,
         path: '/peerjs',
@@ -13,6 +14,7 @@
 
     });
 
+    //Variables of the P2P CDN streaming.
     var runned = false;
     var interval;
 
@@ -21,9 +23,11 @@
         /*Beginning of the collaboration part of the project. */
 
         //List to save all incoming calls and outgoing calls.
-        var inCalls = [];
+        var inCallsLocal = [];
+        var inCallsRemote = [];
         var outCalls = [];
 
+        //Variable to save the hash of the secondary streamers list.
         var secondaryHash;
 
         // To show the ID of the peer.
@@ -36,38 +40,45 @@
         //When the peer receives a request to connect to it's stream.
         peer.on('call', function(call) {
 
+            //If the peer is watching a remote stream and not streaming.
             if (typeof remoteStream == 'undefined' && typeof localStream != 'undefined') {
 
                 //Answer the call automatically instead of prompting user.
                 call.answer(window.localStream);
                 //Adds a new incoming call to the incoming calls list.
-                inCalls.push(call);
+                inCallsLocal.push(call);
 
+                //If the peer is streaming and not watching a remote stream.
             } else if (typeof remoteStream != 'undefined' && typeof localStream == 'undefined') {
 
                 //Answer the call automatically instead of prompting user.
                 call.answer(window.remoteStream);
                 //Adds a new incoming call to the incoming calls list.
-                inCalls.push(call);
+                inCallsRemote.push(call);
 
+                //If the peer is streaming and is watching a remote stream.
             } else if (typeof remoteStream != 'undefined' && typeof localStream != 'undefined') {
 
-                /**This is not working and I can't make it work, but this is the solution for what I want.*/
-                /*var newStream = new MediaStream(remoteStream);
+                //Creates a new media stream so that the stream that the peer is watching is not affected.
+                var newStream = new MediaStream(remoteStream);
+                //Extracts the video track from the remote stream.
+                var newStreamVideo = newStream.getVideoTracks()[0];
 
-                var newStreamAudio = newStream.getAudioTracks();
-
-                var newStreamVideo = newStream.removeTrack(newStreamAudio);
-
+                //Creates a new media stream so that the stream that the peer is streaming is not affected.
                 var oldStream = new MediaStream(localStream);
-                var oldStreamAudio = oldStream.getAudioTracks();
+                //Extracts the audio track from the local stream.
+                var oldStreamAudio = oldStream.getAudioTracks()[0];
 
-                newStream = newStream.addTrack(oldStreamAudio);*/
+                //Array with the video track from the remote stream and the audio track from the local stream.
+                var mix = [newStreamVideo, oldStreamAudio];
+
+                //Creates a new stream with the video from the remote stream and the audio track from the local stream.
+                newStreamMix = new MediaStream(mix);
 
                 //Answer the call automatically instead of prompting user.
-                call.answer(window.localStream); //newStream
+                call.answer(window.newStreamMix);
                 //Adds a new incoming call to the incoming calls list.
-                inCalls.push(call);
+                inCallsLocal.push(call);
 
             };
 
@@ -83,20 +94,29 @@
         //Begins the stream of the user. Basically, gets its video and audio and displays to the user.
         function startStream() {
 
+            //Will ask for permission to use the webcam and the microphone.
             var constraints = { audio: true, video: true };
 
+            //If a peer starts streaming and is a secondary streamer is deleted from the list of secondary streamers.
             peer.deleteSecondaryStreamer(secondaryHash);
 
+            //Prompts the user for permission to use one video and one audio input device.
             navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
 
+                //Shows the video to the user on the HTML tag 'myvideo'.
                 $('#myvideo').prop('src', URL.createObjectURL(stream));
+                //To define the local stream.
                 window.localStream = stream;
+                //Blocks the style of the div.
                 document.getElementById('myVideoStreamHidden').style.display = "block";
 
+                //Hashes to easily access the lists.
                 mainHash = btoa('mainstreamer');
                 secondaryHash = btoa(peer.id);
 
+                //Announces this peer as a main streamer, to appear on the 'Streams available'. 
                 peer.announceStream(mainHash);
+                //Announces this peer as a secondary streamer, for peers to connect to him.
                 peer.announceSecondaryStream(secondaryHash);
 
             }).catch(function(err) { console.log(err.name + ": " + err.message); });
@@ -106,10 +126,13 @@
         //Stops users own stream. 
         function stopOwnStream(inCalls) {
 
+            //Hashes to easily access the lists.
             mainHash = btoa('mainstreamer');
             secondaryHash = btoa(peer.id);
 
+            //Deletes this peer as a main streamer, to stop appearing on the 'Streams available'.
             peer.deleteStreamer(mainHash);
+            //Deletes this peer as a secondary streamer, for peers to stop connecting to him.
             peer.deleteSecondaryStreamer(secondaryHash);
 
             //Hide the div where the video is.
@@ -119,18 +142,21 @@
             localStream.stop();
 
             //Closes all the incoming calls.
-            for (var i = 0; i < inCalls.length; i++) {
+            for (var i = 0; i < inCallsLocal.length; i++) {
 
-                inCalls[i].close();
+                inCallsLocal[i].close();
 
             };
 
             //Resets the list to save all incoming calls that a peer receives.
-            var inCalls = [];
+            var inCallsLocal = [];
 
-            if (typeof secondaryHash != 'undefined' && btoa(document.getElementById('calltoid').value) != '') {
+            //In case the peer is watching a remote stream.
+            if (btoa(document.getElementById('calltoid').value) != '') {
 
+                //Hash to easily access the list.
                 secondaryHash = btoa(document.getElementById('calltoid').value);
+                //Announces this peer as a secondary streamer, for peers to connect to him.
                 peer.announceSecondaryStream(secondaryHash);
 
             };
@@ -140,51 +166,64 @@
         //It connects and shows the stream we want.
         function showTheirStream() {
 
+            //If a peer was watching a different remote stream is deleted from the secondary streamers of the former remote stream.
             if (secondaryHash != btoa(document.getElementById('calltoid').value) && typeof secondaryHash != 'undefined') {
 
+                //Deletes this peer as a secondary streamer, for peers to stop connecting to him.
                 peer.deleteSecondaryStreamer(secondaryHash);
 
             }
 
+            //Hash to easily access the list.
             secondaryHash = btoa(document.getElementById('calltoid').value);
 
+            //Will ask for permission to use the webcam and the microphone.
             var constraints = { audio: true, video: true };
+            //Array to save a random peer.
             var randomPeer = [];
 
+            //Gets a list of all the secondary streamers to a remote stream.
             peer.listAllSecondaryStreamers(secondaryHash, function(list) {
 
+                //Chooses a random peer to connect to.
                 randomPeer = list[Math.floor(Math.random() * list.length)];
-
-                while (randomPeer == peer.id) {
-
-                    randomPeer = list[Math.floor(Math.random() * list.length)];
-
-                };
 
             });
 
+            //Prompts the user for permission to use one video and one audio input device.
             navigator.mediaDevices.getUserMedia(constraints).then(function(NULL) {
 
+                //Associates the video to the HTML tag 'mytheirvideo' but is not shown.
                 $('#mytheirvideo').prop('src', URL.createObjectURL(NULL));
+                //To define the local stream.
                 window.localStreamVideo = NULL;
 
+                //Defines the call.
                 var call = peer.call(randomPeer, NULL);
 
+                //Blocks the style of the div.
                 document.getElementById('theirVideoStreamHidden').style.display = "block";
+                //Hide the div where the video is.
                 document.getElementById('mainvideo').style.display = "none";
 
+                //Makes the call to the random peer.
                 call.on('stream', function(stream) {
 
+                    //Shows the video to the user on the HTML tag 'theirvideo'.
                     $('#theirvideo').prop('src', URL.createObjectURL(stream));
+                    //To define the remote stream.
                     window.remoteStream = stream;
 
                 });
 
+                //Stops the video and audio tracks.
                 localStreamVideo.stop();
+                //To define the call.
                 window.existingCall = call;
                 //Adds a new outgoing call to the outgoing calls list.
                 outCalls.push(call);
 
+                //Announces this peer as a secondary streamer, for peers to connect to him.
                 peer.announceSecondaryStream(secondaryHash);
 
             }).catch(function(err) { console.log(err.name + ": " + err.message); });
@@ -192,16 +231,18 @@
         };
 
         //It stops the stream that we are watching. 
-        function stopTheirStream(outCalls, inCalls) {
+        function stopTheirStream(outCalls, inCallsRemote) {
 
+            //Hashes to easily access the lists.
             secondaryHash = btoa(document.getElementById('calltoid').value);
             peer.deleteSecondaryStreamer(secondaryHash);
 
+            //Blocks the style of the div.
             document.getElementById('mainvideo').style.display = "block";
             //Hide the div where the video is.
             document.getElementById('theirVideoStreamHidden').style.display = "none";
 
-            //Closes all the incoming calls.
+            //Closes all the outgoing calls.
             for (var i = 0; i < outCalls.length; i++) {
 
                 outCalls[i].close();
@@ -211,14 +252,14 @@
             //Closes all the incoming calls.
             for (var i = 0; i < inCalls.length; i++) {
 
-                inCalls[i].close();
+                inCallsRemote[i].close();
 
             };
 
             //Resets the list to save all outgoing calls that a peer does.
             var outCalls = [];
             //Resets the list to save all incoming calls that a peer receives.
-            var inCalls = [];
+            var inCallsRemote = [];
 
         };
 
@@ -239,7 +280,7 @@
         //Terminate stream.
         $('#stopownstream').click(function() {
 
-            stopOwnStream(inCalls);
+            stopOwnStream(inCallsLocal);
 
         });
 
@@ -253,29 +294,34 @@
         //Terminate the stream we are watching.
         $('#stoptheirstream').click(function() {
 
-            stopTheirStream(outCalls, inCalls);
+            stopTheirStream(outCalls, inCallsRemote);
 
         });
 
         //Get the list of streamers.
         $('#streamslist').click(function() {
 
+            //Clears the list so there are no duplicates.
             $("#streamlist").empty();
+            //Hash to easily access the list.
             hash = btoa('mainstreamer');
+            //Text variable.
             var streamList = "";
 
+            //Gets a list of all the main streamers.
             peer.listAllStreamers(hash, function(list) {
 
+                //Adds each element of the list to the text variable.
                 for (i = 0; i < list.length; i++) {
 
                     streamList += "<li>" + list[i] + "</li>";
 
                 }
 
+                //Shows the list to the user.
                 $("#streamlist").append(streamList);
 
             });
-
 
         });
 

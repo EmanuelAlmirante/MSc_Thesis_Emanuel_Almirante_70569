@@ -12,9 +12,10 @@
 
     <link rel="stylesheet" href="css/index.css" type="text/css">
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <!-- ALTERAR ISTO!-->
-    <script type="text/javascript" src="/js/peer.js"></script>
+    <script type="text/javascript" src="/js/peer.min.js"></script>
     <script type="text/javascript" src="/js/index.js"></script>
+
+    <!--<script src="//cdnjs.cloudflare.com/ajax/libs/shaka-player/2.0.1/shaka-player.compiled.js"></script>-->
 
 </head>
 
@@ -40,6 +41,19 @@
         <ul id="streamlist">
         </ul>
     </div>
+
+    <!--<video id="mainvideo" width="1000" height="500" controls autoplay></video>
+    <script>
+        var video = document.getElementById('mainvideo');
+        window.shaka.polyfill.installAll();
+
+        if (!shaka.Player.isBrowserSupported()) {
+            parentEl.innerHTML = 'Shaka player is not supported in this browser';
+        } else {
+            var player = new shaka.Player(video);
+            player.load("/vid/30_dash.mpd");
+        }
+    </script>-->
 
     <video id="mainvideo" data-src="/vid/30.mp4" allowfullscreen type="video/mp4" controls autoplay></video>
 

@@ -126,7 +126,7 @@
         };
 
         //Stops users own stream. 
-        function stopOwnStream(inCalls) {
+        function stopOwnStream(inCallsLocal) {
 
             //Hashes to easily access the lists.
             mainHash = btoa('mainstreamer');
@@ -156,7 +156,7 @@
             var inCallsLocal = [];
 
             //In case the peer is watching a remote stream.
-            if (btoa(document.getElementById('calltoid').value) != '') {
+            if (btoa(document.getElementById('calltoid').value) != '' && remoteStream != 'undefined') {
 
                 //Hash to easily access the list.
                 secondaryHash = btoa(document.getElementById('calltoid').value);
@@ -199,6 +199,7 @@
 
                 //Associates the video to the HTML tag 'mytheirvideo' but is not shown.
                 $('#mytheirvideo').prop('src', URL.createObjectURL(NULL));
+
                 //To define the local stream.
                 window.localStreamVideo = NULL;
 
@@ -268,6 +269,9 @@
                 inCallsRemote[i].close();
 
             };
+
+            //Stops the video and audio tracks.
+            remoteStream.stop();
 
             //Resets the list to save all outgoing calls that a peer does.
             var outCalls = [];

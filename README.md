@@ -1,4 +1,4 @@
-# MSc_Thesis_Emanuel_Almirante_70569
+# MSc Thesis
 
 Runs in every Firefox version, but the most stable is the version 38 although it doesn't implement all functionalities. Not tested in any other web browser.
 
